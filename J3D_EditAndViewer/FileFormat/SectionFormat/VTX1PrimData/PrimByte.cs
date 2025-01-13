@@ -12,9 +12,9 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat.VTX1PrimData
     {
         public Vector3 GetData { get; private set; }
 
-        public Vector3 Set(BinaryReader br)
+        public Vector3 Set(BinaryReader br, byte shiftBit)
         {
-            return new Vector3(br.ReadByte(), br.ReadByte(), br.ReadByte());
+            return new Vector3(br.ReadByte() >> shiftBit, br.ReadByte() >> shiftBit, br.ReadByte() >> shiftBit);
         }
 
 

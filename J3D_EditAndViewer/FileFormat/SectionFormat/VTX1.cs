@@ -9,9 +9,20 @@ using J3D_EditAndViewer.FileFormat.SectionFormat.VTX1ColorData;
 using System.IO.Compression;
 using J3D_EditAndViewer.FileFormat.SectionFormat.VTX1PrimData;
 using OpenTK;
+using System.Drawing;
+using System.Diagnostics;
 
 namespace J3D_EditAndViewer.FileFormat.SectionFormat
 {
+    /*
+     * Note:オフセット値の具体的なアドレスは下記です
+     * 0x00 4byte VTX1
+     * 0x04 4byte Size
+     * 0x08 4byte VertexFormatOffset
+     * 
+     * 
+     */
+
     public class VTX1
     {
         private long SectionBaseAddres;
@@ -28,7 +39,7 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat
         private int _inf1VertexCount;
 
         //private byte VertexAttributeCount;
-        private List<(bool,int)> IsReadArray;
+        private List<(bool, int)> IsReadArray;
 
         public List<Vector3> Position { get; private set; }
         public List<Vector3> Normal { get; private set; }
@@ -53,7 +64,7 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat
             BytesList = new List<byte[]>();
             //BytesArray.Add(new List<byte>());
 
-            IsReadArray = new List<(bool,int)>();
+            IsReadArray = new List<(bool, int)>();
             ColorDataArrayOffset = new int[COLOR_ARRAY_MAX];
             TexcoordDataArrayOffset = new int[TEXTURE_ARRAY_MAX];
 
@@ -68,40 +79,30 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat
 
             SectionBaseAddres = br.BaseStream.Position;
 
+
+            //ヘッダー
             SectionName = Encoding.ASCII.GetString(br.ReadBytes(4));
             SectionSize = BigEndian.ReadInt32(br);
-
             VertexFormatOffset = BigEndian.ReadInt32(br);
-
-
             //PositionDataArrayOffset = BigEndian.ReadInt32(br);
             //NormalDataArrayOffset = BigEndian.ReadInt32(br);
             //NBT_DataArrayOffset = BigEndian.ReadInt32(br);
-
-            ////DataCountAdder(VertexFormatOffset);
-            //DataCountAdder(PositionDataArrayOffset);
-            //DataCountAdder(NormalDataArrayOffset);
-            //DataCountAdder(NBT_DataArrayOffset);
-
             //for (int i = 0; i < COLOR_ARRAY_MAX; i++)
             //{
             //    ColorDataArrayOffset[i] = BigEndian.ReadInt32(br);
-            //    DataCountAdder(ColorDataArrayOffset[i]);
             //}
-
-
             //for (int j = 0; j < TEXTURE_ARRAY_MAX; j++)
             //{
             //    TexcoordDataArrayOffset[j] = BigEndian.ReadInt32(br);
-            //    DataCountAdder(TexcoordDataArrayOffset[j]);
             //}
 
 
-            for (int i = 0; i < 13; i++) 
+            for (int i = 0; i < 13; i++)
             {
+                Debug.Write($"{Enum.GetName(typeof(ArrayName),i)}:");
                 SetOffsetPositionAndIsRead(br);
             }
-            
+
 
             //VTX1のデータを取得
             VertexAttributeSet(br);
@@ -112,127 +113,188 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat
             //pos
             ReadArrays(br);
 
+            Console.WriteLine($"↑{nameof(ReadArrays)}の実装が完全ではない為間違った範囲までバイナリを読み込んでしまっています");
             Console.WriteLine($"endpos: {br.BaseStream.Position.ToString("X")}");
             Console.WriteLine("VTX1 End");
             Console.WriteLine();
         }
 
-        public List<VTX1DataAttributes> VTX1DataAttributesList{ get; private set; }
+        public List<VTX1DataAttributes> VTX1DataAttributesList { get; private set; }
 
-        private void ReadArrays(BinaryReader br) 
+        private void ReadArrays(BinaryReader br)
         {
-            
-            
+            var IsReadData = IsReadArray.Where(x => x.Item1 == true).ToList();
 
-            //var IsReadData = IsReadArray.Where(x => x.Item1 == true).ToList();
+            int NextPosIndex = 1;
+            //for (int i = 0; i < IsReadArray.Count - 1; i++)
+            //{
+            //    Console.WriteLine("Start read pos" + br.BaseStream.Position.ToString("X"));
+            //    if (SectionBaseAddres + SectionSize == IsReadArray[i].Item2) break;
+            //    if (SectionBaseAddres == IsReadArray[i].Item2) continue;
+            //    //読み込みフラグがfalseなら読み込まない
+            //    if (IsReadArray[i].Item1 == false)
+            //    {
+            //        BytesList.Add(null);
+            //        continue;
+            //    }
 
-            int NextPosIndex = 1; 
-            for (int i = 0; i < IsReadArray.Count - 1; i++)
-            {
-                Console.WriteLine("Start read pos" + br.BaseStream.Position.ToString("X"));
-                if (SectionBaseAddres + SectionSize == IsReadArray[i].Item2) break;
-                if (SectionBaseAddres == IsReadArray[i].Item2) continue;
-                //読み込みフラグがfalseなら読み込まない
-                if (IsReadArray[i].Item1 == false)
-                {
-                    BytesList.Add(null);
-                    continue;
-                }
+            //    var CurrentPosition  = IsReadArray[i].Item2;
+            //    var NextPosition     = IsReadArray[i + NextPosIndex].Item2;
 
-                var CurrentPosition  = IsReadArray[i].Item2;
-                var NextPosition     = IsReadArray[i + NextPosIndex].Item2;
+            //    //NextPositionがSectionBaseAddres以下の場合計算できないので判別する
+            //    if (IsReadArray[i + NextPosIndex].Item2 == SectionBaseAddres) 
+            //    {
+            //        //NextPositionが0よりも大きい場合を取得
+            //        while (true) 
+            //        {
+            //            NextPosIndex++;
+            //            NextPosition = IsReadArray[i + NextPosIndex].Item2;
+            //            if (NextPosition > SectionBaseAddres) break;
+            //        }
+            //    }
+            //    Console.WriteLine("★Position Data");
+            //    Console.WriteLine(NextPosition.ToString("X"));
+            //    Console.WriteLine(CurrentPosition.ToString("X"));
+            //    var readbytes = NextPosition - CurrentPosition;
+            //    Console.WriteLine("readbytes: " +readbytes.ToString("X"));
+            //    BytesList.Add(br.ReadBytes(readbytes));
+            //    //パディングも含めたバイト配列を取得する
+            //    //for (long j = CurrentPosition; j < NextPosition; j++) 
+            //    //{
 
-                //NextPositionがSectionBaseAddres以下の場合計算できないので判別する
-                if (IsReadArray[i + NextPosIndex].Item2 == SectionBaseAddres) 
-                {
-                    //NextPositionが0よりも大きい場合を取得
-                    while (true) 
-                    {
-                        NextPosIndex++;
-                        NextPosition = IsReadArray[i + NextPosIndex].Item2;
-                        if (NextPosition > SectionBaseAddres) break;
-                    }
-                }
-                Console.WriteLine("★Position Data");
-                Console.WriteLine(NextPosition.ToString("X"));
-                Console.WriteLine(CurrentPosition.ToString("X"));
-                var readbytes = NextPosition - CurrentPosition;
-                Console.WriteLine("readbytes: " +readbytes.ToString("X"));
-                BytesList.Add(br.ReadBytes(readbytes));
-                //パディングも含めたバイト配列を取得する
-                //for (long j = CurrentPosition; j < NextPosition; j++) 
-                //{
+            //    //}
 
-                //}
-
-            }
+            //}
 
             Console.WriteLine(br.BaseStream.Position.ToString("X"));
-            return;
+            //return;
 
-            foreach (var vtx1 in VTX1DataAttributesList.Select((Value,Index)=> (Value, Index))) 
+            var vertexPosition = SectionBaseAddres;
+            Console.WriteLine($"{nameof(_inf1VertexCount)}:{_inf1VertexCount.ToString():X}");
+            foreach (var vtx1 in VTX1DataAttributesList.Select((Value, Index) => (Value, Index)))
             {
+                Console.WriteLine($"{vtx1.Value.GXAttr}_BinaryReadPos:{br.BaseStream.Position:X}");
+
+                if(!(vtx1.Value.GXAttr == GXAttributeTypes.NullAttribute))
+                Console.WriteLine($"{nameof(vtx1.Value.GXAttr)}:{vtx1.Value}");
+                
                 
 
-
-                Console.WriteLine($"{vtx1.Value.GXAttr}: " + br.BaseStream.Position.ToString("X"));
-                if (vtx1.Value.GXAttr == GXAttributeTypes.NullAttribute) break;
-                
-                if (vtx1.Value.GXAttr == GXAttributeTypes.Color0 || vtx1.Value.GXAttr == GXAttributeTypes.Color0)
+                switch (vtx1.Value.GXAttr) 
                 {
-                    for (int i = 0; i < _inf1VertexCount; i++)
-                        GXColorTypes[vtx1.Value.GXCompType].GetColor(br);
-                }
-                else if (vtx1.Value.GXAttr == GXAttributeTypes.Position)
-                {
+                    case GXAttributeTypes.NullAttribute:
+                        br.BaseStream.Seek(vertexPosition + SectionSize, SeekOrigin.Begin);
+                        //NullAttributeはリストの終了宣言なのでデータを読み込まない
+                        break;
 
-                    for (int j = 0; j < _inf1VertexCount; j++)
-                    {
-                        Position.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br));
-                    }
+                    case GXAttributeTypes.Color0:
+                    case GXAttributeTypes.Color1:
+                        br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
+                        for (int i = 0; i < vtx1.Value.GXCompCount; i++)
+                            GXColorTypes[vtx1.Value.GXCompType].GetColor(br);
+                        break;
+
+                    case GXAttributeTypes.Position:
+                        br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2,SeekOrigin.Begin);
+
+                        for (int j = 0; j < _inf1VertexCount; j++)
+                        {
+                            Position.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br, vtx1.Value.CompShift));
+                        }
+                        break;
+
+                    case GXAttributeTypes.Normal:
+                        br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
+
+                        for (int j = 0; j < _inf1VertexCount/3; j++)
+                        {
+                            Normal.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br, vtx1.Value.CompShift));
+                        }
+                        break;
+                    default:
+                        br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
+                        for (int j = 0; j < vtx1.Value.GXCompCount; j++)
+                        {
+                            Dummy.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br, vtx1.Value.CompShift));
+                        }
+                        break;
+
 
                 }
-                else if (vtx1.Value.GXAttr == GXAttributeTypes.Normal)
-                {
-                    Console.WriteLine($"Normal Coune: {(IsReadArray[vtx1.Index + 1].Item2 - IsReadArray[vtx1.Index].Item2).ToString("X")}");
-                    Console.WriteLine($"{GXDataTypes[vtx1.Value.GXCompType]}");
-                    var nextofsset = IsReadArray[vtx1.Index + 1].Item2;
-                    if (nextofsset == 0) nextofsset = IsReadArray[vtx1.Index + 2].Item2;
 
-                    var roopMax =  nextofsset - IsReadArray[vtx1.Index].Item2;
-                    roopMax = ((roopMax) / 2) / 3;
-                    Console.WriteLine($"roopMax: {roopMax.ToString("X")}");
-                    for (int j = 0; j < roopMax /*_iNF1_VertexCount*/; j++)
-                    {
-                        Normal.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br));
-                        //Console.WriteLine(br.BaseStream.Position.ToString("X"));
-                    }
-                    
-                }
-                else 
-                {
-                    for (int j = 0; j < _inf1VertexCount; j++)
-                    {
-                        Dummy.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br));
-                    }
-                }
 
-                    
+                //Console.WriteLine($"{vtx1.Value.GXAttr}: " + br.BaseStream.Position.ToString("X"));
+                //if (vtx1.Value.GXAttr == GXAttributeTypes.NullAttribute) break;
+
+                //if (vtx1.Value.GXAttr == GXAttributeTypes.Color0 || vtx1.Value.GXAttr == GXAttributeTypes.Color0)
+                //{
+                //    for (int i = 0; i < _inf1VertexCount; i++)
+                //        GXColorTypes[vtx1.Value.GXCompType].GetColor(br);
+                //}
+                //else if (vtx1.Value.GXAttr == GXAttributeTypes.Position)
+                //{
+
+                //    for (int j = 0; j < _inf1VertexCount; j++)
+                //    {
+                //        Position.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br));
+                //    }
+
+                //}
+                //else if (vtx1.Value.GXAttr == GXAttributeTypes.Normal)
+                //{
+                //    Console.WriteLine($"Normal Coune: {(IsReadArray[vtx1.Index + 1].Item2 - IsReadArray[vtx1.Index].Item2).ToString("X")}");
+                //    Console.WriteLine($"{GXDataTypes[vtx1.Value.GXCompType]}");
+
+                //    var nextofsset = IsReadArray[vtx1.Index + 1].Item2;
+                //    if (nextofsset == 0) nextofsset = IsReadArray[vtx1.Index + 2].Item2;
+
+                //    var roopMax = nextofsset - IsReadArray[vtx1.Index].Item2;
+                //    roopMax = ((roopMax) / 2) / 3;
+                //    Console.WriteLine($"roopMax: {roopMax.ToString("X")}");
+                //    for (int j = 0; j < roopMax /*_iNF1_VertexCount*/; j++)
+                //    {
+                //        Normal.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br));
+                //        Console.WriteLine(br.BaseStream.Position.ToString("X"));
+                //    }
+
+                //}
+                //else
+                //{
+                //    for (int j = 0; j < _inf1VertexCount; j++)
+                //    {
+                //        Dummy.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br));
+                //        Console.WriteLine($"{nameof(Dummy)}:{br.BaseStream.Position.ToString("X")}");
+                //    }
+                //}
+
+
                 J3DFileStreamSys.PaddingSkip(br);
-                
+
             }
         }
 
-        private void SetOffsetPositionAndIsRead(BinaryReader br) 
+
+        /// <summary>
+        /// VTX1のデータ配列のオフセット値を読み込みます。<br/>
+        /// その際に読み込み不要なデータ配列を判別します。
+        /// </summary>
+        /// <param name="br"></param>
+        private void SetOffsetPositionAndIsRead(BinaryReader br)
         {
-            var ReadInt32 = BigEndian.ReadInt32(br);
-            if (ReadInt32 > 0) 
+            var dataOffset = BigEndian.ReadInt32(br);
+
+            if (dataOffset > 0)
             {
-                IsReadArray.Add((true,(int)SectionBaseAddres + ReadInt32));
-                return;
+                IsReadArray.Add((true,   (int)SectionBaseAddres + dataOffset));
+            }
+            else 
+            {
+                //オフセットが0の場合はそのデータ配列が
+                //VTX1セクションに存在しないので読み込まない
+                IsReadArray.Add((false,  (int)SectionBaseAddres + dataOffset));
             }
 
-            IsReadArray.Add((false,(int)SectionBaseAddres + ReadInt32));
+            Debug.WriteLine($":{dataOffset}");
         }
 
         /// <summary>
@@ -253,13 +315,14 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat
                 var GXAttrType = (GXAttributeTypes)BigEndian.ReadUInt32(br);
                 var GXCompCount = BigEndian.ReadUInt32(br);
                 var GXAttr = BigEndian.ReadUInt32(br);
+                var GXCompShift = br.ReadByte();
 
                 var vTX1DataAttributes =
                         new VTX1DataAttributes(
                         GXAttrType,
                         GXCompCount,
                         GXAttr,
-                        br.ReadByte()
+                        GXCompShift
                         );
 
                 //パディングをスキップ
@@ -284,7 +347,7 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat
         //}
 
 
-        
+
         //関数はここまで
 
         //以下　定数　列挙配列　辞書　構造体宣言　などの不変の物
@@ -322,7 +385,7 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat
             NullAttribute = 0x000000FF
         }
 
-        public enum ArrayName :byte
+        public enum ArrayName : int
         {
             Position = 0,
             Normal,

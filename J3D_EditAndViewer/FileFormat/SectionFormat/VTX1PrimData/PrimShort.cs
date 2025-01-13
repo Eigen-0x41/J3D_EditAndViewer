@@ -13,9 +13,9 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat.VTX1PrimData
     {
         public Vector3 GetData { get; private set; }
 
-        public Vector3 Set(BinaryReader br)
+        public Vector3 Set(BinaryReader br, byte shiftBit)
         {
-            return new Vector3(BigEndian.ReadInt16(br), BigEndian.ReadInt16(br), BigEndian.ReadInt16(br));
+            return new Vector3(BigEndian.ReadInt16(br) >> shiftBit, BigEndian.ReadInt16(br) >> shiftBit, BigEndian.ReadInt16(br) >> shiftBit);
         }
     }
 }

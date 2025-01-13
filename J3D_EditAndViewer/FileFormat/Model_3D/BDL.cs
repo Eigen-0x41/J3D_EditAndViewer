@@ -37,8 +37,8 @@ namespace J3D_EditAndViewer.FileFormat.Model_3D
                 VerTexData.Read(br,SceneTreeData.VertexCount);
                 SkinningEnvelopes.Read(br);
                 DrawData.Read(br);
-                JointData.Read(br);
-                ShapeData.Read(br);
+                //JointData.Read(br);
+                //ShapeData.Read(br);
             }
         }
 

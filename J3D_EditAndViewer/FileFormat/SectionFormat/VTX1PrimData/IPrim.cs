@@ -11,6 +11,6 @@ namespace J3D_EditAndViewer.FileFormat.SectionFormat.VTX1PrimData
     {
         Vector3 GetData { get; }
 
-        Vector3 Set(BinaryReader br);
+        Vector3 Set(BinaryReader br,byte shift = 0);
     }
 }
