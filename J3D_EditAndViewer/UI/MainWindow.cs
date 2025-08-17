@@ -26,7 +26,7 @@ namespace J3D_EditAndViewer
         private List<Vector3> vertexNormal;
         private static float _farRange = 64.0f;
 
-        
+
 
         public float FarRange
         {
@@ -70,9 +70,9 @@ namespace J3D_EditAndViewer
             //透視射影
             GL.MatrixMode(MatrixMode.Projection);
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(
-                (float)Math.PI / 4, 
+                (float)Math.PI / 4,
                 (float)glControl.Size.Width / (float)glControl.Size.Height,
-                0.1f, 
+                0.1f,
                 FarRange
                 );
             GL.LoadMatrix(ref projection);
@@ -108,141 +108,11 @@ namespace J3D_EditAndViewer
 
         private void GL_Panel_Resize(object sender, EventArgs e)
         {
-            
+
         }
 
-        private void glControl_Load(object sender, EventArgs e)
-        {
-            GL.ClearColor(Color4.Black);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
 
-            // カメラの投影行列設定 (透視投影)
-            float aspectRatio = (float)glControl.Width / (float)glControl.Height;
-            Matrix4 projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), aspectRatio, 0.1f, 100f);
-            GL.LoadMatrix(ref projectionMatrix);
-
-            GL.MatrixMode(MatrixMode.Modelview); // モデルビュー行列に切り替え
-        }
-
-        private void glControl_Resize(object sender, EventArgs e)
-        {
-            GL.Viewport(0, 0, glControl.Width, glControl.Height);
-            //SetProjection();
-            //glControl.SwapBuffers();
-            //glControl.Refresh();
-        }
-
-        private Vector3 m_CamTarget = new Vector3(0f, 0f, 0f);
-        private Vector2 m_CamRotation = new Vector2(1f,1f);
-        private Vector3 m_CamPosition = new Vector3(1f, 1f, 1f);
-        //private Vector3 m_CamRotation = new Vector3(0f,0f,0f);
-        private float m_CamDistance = 0.2f;
-        private bool m_UpsideDown;
-        private Matrix4 m_CamMatrix, m_SkyboxMatrix;
         private bool IsModelLoad = false;
-
-        private void glControl_MouseWheel(object sender, MouseEventArgs e)
-        {
-            //FarRange += 0.1f * e.Delta*10000;
-            
-            //Vector3 up;
-
-            //if (Math.Cos(m_CamRotation.Y) < 0)
-            //{
-            //    m_UpsideDown = true;
-            //    up = new Vector3(0.0f, -1.0f, 0.0f);
-            //}
-            //else
-            //{
-            //    m_UpsideDown = false;
-            //    up = new Vector3(0.0f, 1.0f, 0.0f);
-            //}
-
-            //m_CamPosition.X = m_CamDistance * (float)Math.Cos(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-            //m_CamPosition.Y = m_CamDistance * (float)Math.Sin(m_CamRotation.Y);
-            //m_CamPosition.Z = m_CamDistance * (float)Math.Sin(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-
-            //Console.WriteLine(m_CamPosition);
-
-            //Vector3 skybox_target;
-            //skybox_target.X = -(float)Math.Cos(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-            //skybox_target.Y = -(float)Math.Sin(m_CamRotation.Y);
-            //skybox_target.Z = -(float)Math.Sin(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-
-            //Vector3.Add(ref m_CamPosition, ref m_CamTarget, out m_CamPosition);
-
-            //m_CamMatrix = Matrix4.LookAt(m_CamPosition, m_CamTarget, up);
-            //m_SkyboxMatrix = Matrix4.LookAt(Vector3.Zero, skybox_target, up);
-            //m_CamMatrix = Matrix4.Mult(Matrix4.CreateScale(0.0001f), m_CamMatrix);
-
-
-            //float delta = -((e.Delta /*/ 120f*/) * 100000.0f);
-            //m_CamTarget.X += delta * (float)Math.Cos(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-            //m_CamTarget.Y += delta * (float)Math.Sin(m_CamRotation.Y);
-            //m_CamTarget.Z += delta * (float)Math.Sin(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-
-
-            ////UpdateCamera();
-            ////SetProjection();
-            //var proj = Matrix4.LookAt(7.0f, 5.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-            //GL.LoadMatrix(ref proj);
-            //GL.MatrixMode(MatrixMode.Modelview);
-            //glControl.SwapBuffers();
-            //glControl.Refresh();
-
-
-
-            ////////////float delta = ((e.Delta / 120f) * 100f);
-            ////////////m_CamTarget.X += delta * (float)Math.Cos(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-            ////////////m_CamTarget.Y += delta * (float)Math.Sin(m_CamRotation.Y);
-            ////////////m_CamTarget.Z += delta * (float)Math.Sin(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-
-            //////////////UpdateCamera();
-
-            ////////////GL.MatrixMode(MatrixMode.Modelview);
-
-            ////////////Vector3 up;
-
-            ////////////if (Math.Cos(m_CamRotation.Y) < 0)
-            ////////////{
-            ////////////    m_UpsideDown = true;
-            ////////////    up = new Vector3(0.0f, -1.0f, 0.0f);
-            ////////////}
-            ////////////else
-            ////////////{
-            ////////////    m_UpsideDown = false;
-            ////////////    up = new Vector3(0.0f, 1.0f, 0.0f);
-            ////////////}
-
-            ////////////m_CamPosition.X += m_CamDistance * (float)Math.Cos(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-            ////////////m_CamPosition.Y += m_CamDistance * (float)Math.Sin(m_CamRotation.Y);
-            ////////////m_CamPosition.Z += m_CamDistance * (float)Math.Sin(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-
-            ////////////Console.WriteLine(m_CamPosition);
-
-            ////////////Vector3 skybox_target;
-            ////////////skybox_target.X = -(float)Math.Cos(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-            ////////////skybox_target.Y = -(float)Math.Sin(m_CamRotation.Y);
-            ////////////skybox_target.Z = -(float)Math.Sin(m_CamRotation.X) * (float)Math.Cos(m_CamRotation.Y);
-
-            //Vector3.Add(ref m_CamPosition, ref m_CamTarget, out m_CamPosition);
-
-            ////////////m_CamMatrix = Matrix4.LookAt(m_CamPosition,m_CamTarget, up);
-            //m_SkyboxMatrix = Matrix4.LookAt(Vector3.Zero, skybox_target, up);
-            //m_CamMatrix = Matrix4.Mult(Matrix4.CreateScale(0.0001f), m_CamMatrix);
-
-            ////////////GL.LoadMatrix(ref m_CamMatrix);
-            //SetProjection();
-
-            ////////////glControl.SwapBuffers();
-            ////////////glControl.Refresh();
-
-
-
-
-        }
-
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
             if (!IsModelLoad) return;
@@ -251,12 +121,12 @@ namespace J3D_EditAndViewer
             GL.LoadIdentity();
 
             // カメラの視点を設定（カメラの位置を変更）
-            SetCameraPosition(cameraPosition);
+            SetCameraPosition(cameraPosition, cameraRotation, cameraDistance);
 
             // 1. トライアングル面を描画
             DrawTriangles(vertexPosition.ToArray()/*, vertexNormal.ToArray()*/);
 
-            
+
 
             // 2. 扇状（三角形扇）を描画
             //DrawFan();
@@ -313,10 +183,15 @@ namespace J3D_EditAndViewer
         };
 
         // カメラ位置を設定するメソッド
-        private void SetCameraPosition(Vector3 position)
+        private void SetCameraPosition(Vector3 Position, Vector2 Axsis2, float Distance)
         {
+            Vector3 cameraPos = new Vector3(Position);
+            cameraPos.X -= Distance * ((float)Math.Cos(Axsis2.X) * (float)Math.Cos(Axsis2.Y));
+            cameraPos.Y -= Distance * ((float)Math.Sin(Axsis2.Y));
+            cameraPos.Z -= Distance * (-(float)Math.Sin(Axsis2.X) * (float)Math.Cos(Axsis2.Y));
+
             // カメラの位置を計算して、視点行列を設定
-            Matrix4 cameraMatrix = Matrix4.LookAt(position, Vector3.Zero, Vector3.UnitY);
+            Matrix4 cameraMatrix = Matrix4.LookAt(cameraPos, Position, Vector3.UnitY);
             GL.LoadMatrix(ref cameraMatrix);  // 行列を適用
         }
 
@@ -388,9 +263,9 @@ namespace J3D_EditAndViewer
             }
 
             Vector3[] vertices = new Vector3[triangleVertices.Length];
-            for (int a = 0; a < triangleVertices.Length; a++) 
+            for (int a = 0; a < triangleVertices.Length; a++)
             {
-                vertices[a] = triangleVertices[a]/1000f;
+                vertices[a] = triangleVertices[a] / 1000f;
             }
 
             //int vertexBuffer;
@@ -446,7 +321,9 @@ namespace J3D_EditAndViewer
             glControl.Invalidate();
         }
 
-        private Vector3 cameraPosition = new Vector3(0.0f, 0.0f, 3.0f);  // カメラの初期位置
+        private Vector3 cameraPosition = new Vector3(0.0f, 0.0f, 0.0f);  // カメラの初期位置
+        private Vector2 cameraRotation = new Vector2(0.0f, 0.0f);  // カメラの初期回転
+        private float cameraDistance = 3.0f;  // カメラの回転軸に対する位置
         private float cameraSpeed = 0.5f;  // カメラの移動速度
         private Vector3 lightPosition = new Vector3(0.0f, 2.0f, 2.0f);  // ライトの位置
         private int vertexBuffer;
@@ -480,6 +357,74 @@ namespace J3D_EditAndViewer
 
             glControl.Invalidate();  // 描画を更新
         }
+        private Point BeforeMousePoint = new Point();
+        private void glControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            float deltaX = e.X - BeforeMousePoint.X;
+            float deltaY = e.Y - BeforeMousePoint.Y;
+            BeforeMousePoint = new Point(e.X, e.Y);
+
+            //Console.WriteLine($"{m_PickingFrameBuffer[0]}");
+
+            if (e.Button != MouseButtons.None)
+            {
+                switch (e.Button)
+                {
+                    case MouseButtons.Left:
+
+                        deltaX *= 0.005f;
+                        deltaY *= 0.005f;
+
+                        cameraRotation.X += deltaX;
+                        cameraRotation.Y += deltaY;
+
+                        //m_CamRotation.X -= deltaX * (float)Math.Sin(_camRotation.X);
+                        //m_CamRotation.X -= deltaY * (float)Math.Cos(_camRotation.X) * (float)Math.Sin(_camRotation.Y);
+                        //m_CamRotation.Y += deltaY * (float)Math.Cos(_camRotation.Y);
+                        //m_CamRotation.Z += deltaX * (float)Math.Cos(_camRotation.X);
+                        //m_CamRotation.Z -= deltaY * (float)Math.Sin(_camRotation.X) * (float)Math.Sin(_camRotation.Y);
+                        break;
+                    case MouseButtons.Right:
+                        //if (_upsideDown)
+                        //    xdelta = -xdelta;
+
+                        //_camRotation.X -= xdelta * 0.002f;
+                        //_camRotation.Y -= ydelta * 0.002f;
+                        break;
+                }
+                glControl.Invalidate();  // 描画を更新
+            }
+        }
+
+        private void glControl_Load(object sender, EventArgs e)
+        {
+            GL.ClearColor(Color4.Black);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+
+            // カメラの投影行列設定 (透視投影)
+            float aspectRatio = (float)glControl.Width / (float)glControl.Height;
+            Matrix4 projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), aspectRatio, 0.1f, 100f);
+            GL.LoadMatrix(ref projectionMatrix);
+
+            GL.MatrixMode(MatrixMode.Modelview); // モデルビュー行列に切り替え
+        }
+
+        private void glControl_Resize(object sender, EventArgs e)
+        {
+            GL.Viewport(0, 0, glControl.Width, glControl.Height);
+            //SetProjection();
+            //glControl.SwapBuffers();
+            //glControl.Refresh();
+        }
+
+        private void glControl_MouseWheel(object sender, MouseEventArgs e)
+        {
+            cameraDistance += -0.001f * e.Delta;
+
+            glControl.Invalidate();  // 描画を更新
+        }
+
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
