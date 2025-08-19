@@ -1,15 +1,11 @@
-ï»¿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using J3DEditAndViewer;
 
-namespace J3DEditAndViewer
+namespace J3DEditorAndViewer
 {
     static class Program
     {
         /// <summary>
-        /// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®ãƒ¡ã‚¤ãƒ³ ã‚¨ãƒ³ãƒˆãƒª ãƒã‚¤ãƒ³ãƒˆã§ã™ã€‚
+        /// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌƒƒCƒ“ ƒGƒ“ƒgƒŠ ƒ|ƒCƒ“ƒg‚Å‚·B
         /// </summary>
         [STAThread]
         static void Main()

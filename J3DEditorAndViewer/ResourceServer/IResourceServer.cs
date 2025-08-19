@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditAndViewer.FileFormat.SectionFormat.VTX1PrimData
+namespace J3DEditorAndViewer.ResourceServer
 {
-    public interface IPrimGet<T>
+    internal interface IResourceServer
     {
-        T GetData { get;}
+        void Clear();
     }
 }

@@ -29,7 +29,7 @@ namespace J3DEditAndViewer
         /// </summary>
         private void InitializeComponent()
         {
-            this.glControl = new OpenTK.GLControl();
+            this.glControl = new OpenTK.GLControl.GLControl();
             this.MainPanel = new System.Windows.Forms.Panel();
             this.GL_Panel = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -56,7 +56,7 @@ namespace J3DEditAndViewer
             this.glControl.Name = "glControl";
             this.glControl.Size = new System.Drawing.Size(615, 452);
             this.glControl.TabIndex = 0;
-            this.glControl.VSync = false;
+            //this.glControl.VSync = false;
             this.glControl.Load += new System.EventHandler(this.glControl_Load);
             this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl_Paint);
             this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyDown);
@@ -66,8 +66,8 @@ namespace J3DEditAndViewer
             // 
             // MainPanel
             // 
-            this.MainPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.MainPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MainPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.MainPanel.Controls.Add(this.GL_Panel);
@@ -89,7 +89,7 @@ namespace J3DEditAndViewer
             // 
             // panel1
             // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)));
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.textBox1);
@@ -120,8 +120,8 @@ namespace J3DEditAndViewer
             // 
             // SceneTreeView
             // 
-            this.SceneTreeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.SceneTreeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.SceneTreeView.Location = new System.Drawing.Point(0, 27);
             this.SceneTreeView.Name = "SceneTreeView";
@@ -192,7 +192,7 @@ namespace J3DEditAndViewer
 
         #endregion
 
-        private OpenTK.GLControl glControl;
+        private OpenTK.GLControl.GLControl glControl;
         private System.Windows.Forms.Panel MainPanel;
         private System.Windows.Forms.TreeView SceneTreeView;
         private System.Windows.Forms.Panel GL_Panel;

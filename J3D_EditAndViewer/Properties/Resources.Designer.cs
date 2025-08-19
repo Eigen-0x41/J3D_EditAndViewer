@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace J3D_EditAndViewer.Properties {
+namespace J3DEditAndViewer.Properties {
     using System;
     
     

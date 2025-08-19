@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -10,11 +11,10 @@ using System.Windows.Forms;
 using J3DEditAndViewer.IO;
 using J3DEditAndViewer.FileFormat;
 using J3DEditAndViewer.UI.MainWindowSys;
-using OpenTK.Graphics.OpenGL;
 //using System.Collections.
-using OpenTK;
-using OpenTK.Graphics;
-using System.Diagnostics;
+using OpenTK.GLControl;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 //using OpenTK;
 
 namespace J3DEditAndViewer
@@ -119,7 +119,7 @@ namespace J3DEditAndViewer
             GL.LoadIdentity();
 
             // カメラの視点を設定（カメラの位置を変更）
-            SetCameraPosition(cameraPosition, cameraRotation, cameraDistance);
+            ToCameraPositionMatrix(cameraPosition, cameraRotation, cameraDistance);
 
             // 1. トライアングル面を描画
             DrawTriangles(vertexPosition.ToArray()/*, vertexNormal.ToArray()*/);
@@ -181,7 +181,7 @@ namespace J3DEditAndViewer
         };
 
         // カメラ位置を設定するメソッド
-        private void SetCameraPosition(Vector3 Position, Vector2 Axsis2, float Distance)
+        private Matrix4 ToCameraPositionMatrix(Vector3 Position, Vector2 Axsis2, float Distance)
         {
             Vector3 cameraPos = new Vector3(Position);
             cameraPos.X -= Distance * ((float)Math.Cos(Axsis2.X) * (float)Math.Cos(Axsis2.Y));
@@ -189,8 +189,7 @@ namespace J3DEditAndViewer
             cameraPos.Z -= Distance * (-(float)Math.Sin(Axsis2.X) * (float)Math.Cos(Axsis2.Y));
 
             // カメラの位置を計算して、視点行列を設定
-            Matrix4 cameraMatrix = Matrix4.LookAt(cameraPos, Position, Vector3.UnitY);
-            GL.LoadMatrix(ref cameraMatrix);  // 行列を適用
+            return Matrix4.LookAt(cameraPos, Position, Vector3.UnitY);
         }
 
         private void DrawTriangles(Vector3[] triangleVertices)
