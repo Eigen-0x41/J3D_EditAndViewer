@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace J3DEditAndViewer.FileFormat.SectionFormat.VTX1PrimData
+namespace J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData
 {
     
     public class PrimModify<T>

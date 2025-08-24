@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using J3DEditAndViewer.IO;
-using J3DEditAndViewer.FileFormat;
-using J3DEditAndViewer.UI.MainWindowSys;
+using J3DEditorAndViewer.IO;
+using J3DEditorAndViewer.FileFormat;
+using J3DEditorAndViewer.UI.MainWindowSys;
 using OpenTK.Graphics.OpenGL;
 //using System.Collections.
 using OpenTK;
@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 using System.Diagnostics;
 //using OpenTK;
 
-namespace J3DEditAndViewer
+namespace J3DEditorAndViewer
 {
     public partial class MainWindow : Form
     {

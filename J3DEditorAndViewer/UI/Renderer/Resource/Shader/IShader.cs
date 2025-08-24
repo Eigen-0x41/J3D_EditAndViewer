@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.ResourceServer
+namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
 {
-    internal interface IResourceServer
+    internal interface IShader : IResource
     {
-        void Clear();
     }
 }

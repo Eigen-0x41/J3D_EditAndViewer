@@ -1,16 +1,21 @@
-﻿using System;
+﻿// OpenTK
+using OpenTK.GLControl;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+//
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
-using J3DEditAndViewer.FileFormat;
-using J3DEditAndViewer.FileFormat.Model_3D;
-using J3DEditAndViewer.FileFormat.SectionFormat;
+using J3DEditorAndViewer.FileFormat;
+using J3DEditorAndViewer.FileFormat.Model_3D;
+using J3DEditorAndViewer.FileFormat.SectionFormat;
 
 
-namespace J3DEditAndViewer.IO
+namespace J3DEditorAndViewer.IO
 {
     public class J3DFileDialog
     {
@@ -23,12 +28,12 @@ namespace J3DEditAndViewer.IO
         //private TreeNode tn;
         public J3D J3DData { get; private set; }
 
-        public J3DFileDialog() 
+        public J3DFileDialog()
         {
             //treeView = tv;
         }
 
-        public void Open() 
+        public void Open()
         {
             DialogResult dialogResult;
             using (OpenFileDialog ofd = new OpenFileDialog()
@@ -38,21 +43,21 @@ namespace J3DEditAndViewer.IO
                 Filter = _filter,
                 FilterIndex = 1,
                 Title = "開きたいファイル選択"
-            }) 
+            })
             {
                 dialogResult = ofd.ShowDialog();
-                if (dialogResult == DialogResult.OK) 
+                if (dialogResult == DialogResult.OK)
                 {
                     Properties.Settings.Default.Path = Path.GetDirectoryName(ofd.FileName);
                     Properties.Settings.Default.Save();
                     _openFilePath = ofd.FileName;
                     OpenFileStream();
-                    
+
                 }
             }
         }
 
-        private void OpenFileStream() 
+        private void OpenFileStream()
         {
             J3DData = new J3D();
             using (FileStream fs = new FileStream(_openFilePath, FileMode.Open))
@@ -60,9 +65,9 @@ namespace J3DEditAndViewer.IO
                 J3DData.SetFromFile(fs);
             }
         }
-        
 
-        private string GetInitialDirectory() 
+
+        private string GetInitialDirectory()
         {
             var path = Properties.Settings.Default.Path;
             if (Directory.Exists(path) && path != string.Empty)
@@ -72,5 +77,5 @@ namespace J3DEditAndViewer.IO
 
         }
     }
-   
+
 }

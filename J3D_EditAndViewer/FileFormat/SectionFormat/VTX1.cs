@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using J3DEditAndViewer.IO;
-using J3DEditAndViewer.FileFormat.SectionFormat.VTX1ColorData;
+using J3DEditorAndViewer.IO;
+using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1ColorData;
 using System.IO.Compression;
-using J3DEditAndViewer.FileFormat.SectionFormat.VTX1PrimData;
+using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData;
 using OpenTK;
 using System.Drawing;
 using System.Diagnostics;
 using OpenTK.Graphics.OpenGL;
 
-namespace J3DEditAndViewer.FileFormat.SectionFormat
+namespace J3DEditorAndViewer.FileFormat.SectionFormat
 {
     /*
      * Note:オフセット値の具体的なアドレスは下記です

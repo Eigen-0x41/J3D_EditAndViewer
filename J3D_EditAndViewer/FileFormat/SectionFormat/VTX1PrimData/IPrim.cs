@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using OpenTK;
 
-namespace J3DEditAndViewer.FileFormat.SectionFormat.VTX1PrimData
+namespace J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData
 {
     //public interface IPrim<T>:IPrimGet<T>
     //{

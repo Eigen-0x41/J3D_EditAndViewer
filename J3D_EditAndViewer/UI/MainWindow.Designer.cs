@@ -1,5 +1,5 @@
 ﻿
-namespace J3DEditAndViewer
+namespace J3DEditorAndViewer
 {
     partial class MainWindow
     {

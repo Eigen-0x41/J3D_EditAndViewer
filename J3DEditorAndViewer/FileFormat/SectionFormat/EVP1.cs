@@ -1,14 +1,19 @@
-﻿using System;
+﻿// OpenTK
+using OpenTK.GLControl;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+//
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using J3DEditAndViewer.IO;
+using J3DEditorAndViewer.IO;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
 
-namespace J3DEditAndViewer.FileFormat.SectionFormat
+namespace J3DEditorAndViewer.FileFormat.SectionFormat
 {
     public class EVP1
     {

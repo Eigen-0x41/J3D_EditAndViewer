@@ -1,5 +1,5 @@
 ﻿
-namespace J3DEditAndViewer
+namespace J3DEditorAndViewer
 {
     partial class MainWindow
     {
@@ -29,164 +29,169 @@ namespace J3DEditAndViewer
         /// </summary>
         private void InitializeComponent()
         {
-            this.glControl = new OpenTK.GLControl.GLControl();
-            this.MainPanel = new System.Windows.Forms.Panel();
-            this.GL_Panel = new System.Windows.Forms.Panel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.SceneTreeView = new System.Windows.Forms.TreeView();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.splitter1 = new System.Windows.Forms.Splitter();
-            this.MainPanel.SuspendLayout();
-            this.GL_Panel.SuspendLayout();
-            this.panel1.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
-            this.SuspendLayout();
+            glControl = new OpenTK.GLControl.GLControl();
+            MainPanel = new Panel();
+            GL_Panel = new Panel();
+            panel1 = new Panel();
+            button1 = new Button();
+            textBox1 = new TextBox();
+            SceneTreeView = new TreeView();
+            menuStrip1 = new MenuStrip();
+            fileToolStripMenuItem = new ToolStripMenuItem();
+            openToolStripMenuItem = new ToolStripMenuItem();
+            splitter1 = new Splitter();
+            MainPanel.SuspendLayout();
+            GL_Panel.SuspendLayout();
+            panel1.SuspendLayout();
+            menuStrip1.SuspendLayout();
+            SuspendLayout();
             // 
             // glControl
             // 
-            this.glControl.AutoSize = true;
-            this.glControl.BackColor = System.Drawing.Color.Black;
-            this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.glControl.Location = new System.Drawing.Point(0, 0);
-            this.glControl.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
-            this.glControl.Name = "glControl";
-            this.glControl.Size = new System.Drawing.Size(615, 452);
-            this.glControl.TabIndex = 0;
-            //this.glControl.VSync = false;
-            this.glControl.Load += new System.EventHandler(this.glControl_Load);
-            this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl_Paint);
-            this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyDown);
-            this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseMove);
-            this.glControl.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseWheel);
-            this.glControl.Resize += new System.EventHandler(this.glControl_Resize);
+            glControl.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
+            glControl.APIVersion = new Version(3, 3, 0, 0);
+            glControl.BackColor = Color.Black;
+            glControl.Dock = DockStyle.Fill;
+            glControl.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
+            glControl.IsEventDriven = true;
+            glControl.Location = new Point(0, 0);
+            glControl.Margin = new Padding(6, 5, 6, 5);
+            glControl.Name = "glControl";
+            glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Core;
+            glControl.SharedContext = null;
+            glControl.Size = new Size(718, 522);
+            glControl.TabIndex = 0;
+            glControl.Load += glControl_Load;
+            glControl.Paint += glControl_Paint;
+            glControl.KeyDown += glControl_KeyDown;
+            glControl.MouseMove += glControl_MouseMove;
+            glControl.MouseWheel += glControl_MouseWheel;
+            glControl.Resize += glControl_Resize;
             // 
             // MainPanel
             // 
-            this.MainPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.MainPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.MainPanel.Controls.Add(this.GL_Panel);
-            this.MainPanel.Location = new System.Drawing.Point(181, 29);
-            this.MainPanel.Name = "MainPanel";
-            this.MainPanel.Size = new System.Drawing.Size(619, 456);
-            this.MainPanel.TabIndex = 0;
+            MainPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            MainPanel.BorderStyle = BorderStyle.Fixed3D;
+            MainPanel.Controls.Add(GL_Panel);
+            MainPanel.Location = new Point(211, 33);
+            MainPanel.Margin = new Padding(4, 3, 4, 3);
+            MainPanel.Name = "MainPanel";
+            MainPanel.Size = new Size(722, 526);
+            MainPanel.TabIndex = 0;
             // 
             // GL_Panel
             // 
-            this.GL_Panel.AutoSize = true;
-            this.GL_Panel.Controls.Add(this.glControl);
-            this.GL_Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GL_Panel.Location = new System.Drawing.Point(0, 0);
-            this.GL_Panel.Name = "GL_Panel";
-            this.GL_Panel.Size = new System.Drawing.Size(615, 452);
-            this.GL_Panel.TabIndex = 0;
-            this.GL_Panel.Resize += new System.EventHandler(this.GL_Panel_Resize);
+            GL_Panel.AutoSize = true;
+            GL_Panel.Controls.Add(glControl);
+            GL_Panel.Dock = DockStyle.Fill;
+            GL_Panel.Location = new Point(0, 0);
+            GL_Panel.Margin = new Padding(4, 3, 4, 3);
+            GL_Panel.Name = "GL_Panel";
+            GL_Panel.Size = new Size(718, 522);
+            GL_Panel.TabIndex = 0;
+            GL_Panel.Resize += GL_Panel_Resize;
             // 
             // panel1
             // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.panel1.Controls.Add(this.button1);
-            this.panel1.Controls.Add(this.textBox1);
-            this.panel1.Controls.Add(this.SceneTreeView);
-            this.panel1.Location = new System.Drawing.Point(12, 35);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(160, 448);
-            this.panel1.TabIndex = 2;
+            panel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            panel1.Controls.Add(button1);
+            panel1.Controls.Add(textBox1);
+            panel1.Controls.Add(SceneTreeView);
+            panel1.Location = new Point(14, 40);
+            panel1.Margin = new Padding(4, 3, 4, 3);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(187, 517);
+            panel1.TabIndex = 2;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(2, 421);
-            this.button1.Margin = new System.Windows.Forms.Padding(2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(106, 22);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            button1.Location = new Point(2, 486);
+            button1.Margin = new Padding(2);
+            button1.Name = "button1";
+            button1.Size = new Size(124, 25);
+            button1.TabIndex = 2;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // textBox1
             // 
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.textBox1.Location = new System.Drawing.Point(0, 0);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(162, 20);
-            this.textBox1.TabIndex = 0;
+            textBox1.Dock = DockStyle.Left;
+            textBox1.Location = new Point(0, 0);
+            textBox1.Margin = new Padding(4, 3, 4, 3);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(188, 23);
+            textBox1.TabIndex = 0;
             // 
             // SceneTreeView
             // 
-            this.SceneTreeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.SceneTreeView.Location = new System.Drawing.Point(0, 27);
-            this.SceneTreeView.Name = "SceneTreeView";
-            this.SceneTreeView.Size = new System.Drawing.Size(160, 389);
-            this.SceneTreeView.TabIndex = 1;
-            this.SceneTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.SceneTreeView_AfterSelect);
+            SceneTreeView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            SceneTreeView.Location = new Point(0, 31);
+            SceneTreeView.Margin = new Padding(4, 3, 4, 3);
+            SceneTreeView.Name = "SceneTreeView";
+            SceneTreeView.Size = new Size(186, 448);
+            SceneTreeView.TabIndex = 1;
+            SceneTreeView.AfterSelect += SceneTreeView_AfterSelect;
             // 
             // menuStrip1
             // 
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(177, 24);
-            this.menuStrip1.TabIndex = 1;
-            this.menuStrip1.Text = "menuStrip1";
+            menuStrip1.ImageScalingSize = new Size(24, 24);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Padding = new Padding(7, 2, 0, 2);
+            menuStrip1.Size = new Size(206, 24);
+            menuStrip1.TabIndex = 1;
+            menuStrip1.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem });
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new Size(37, 20);
+            fileToolStripMenuItem.Text = "File";
+            fileToolStripMenuItem.Click += fileToolStripMenuItem_Click;
             // 
             // openToolStripMenuItem
             // 
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-            this.openToolStripMenuItem.Text = "Open";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
+            openToolStripMenuItem.Name = "openToolStripMenuItem";
+            openToolStripMenuItem.Size = new Size(180, 22);
+            openToolStripMenuItem.Text = "Open";
+            openToolStripMenuItem.Click += OpenToolStripMenuItem_Click;
             // 
             // splitter1
             // 
-            this.splitter1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.splitter1.Location = new System.Drawing.Point(177, 0);
-            this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(623, 485);
-            this.splitter1.TabIndex = 3;
-            this.splitter1.TabStop = false;
+            splitter1.Dock = DockStyle.Right;
+            splitter1.Location = new Point(206, 0);
+            splitter1.Margin = new Padding(4, 3, 4, 3);
+            splitter1.Name = "splitter1";
+            splitter1.Size = new Size(727, 560);
+            splitter1.TabIndex = 3;
+            splitter1.TabStop = false;
             // 
             // MainWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 485);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.MainPanel);
-            this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.splitter1);
-            this.MainMenuStrip = this.menuStrip1;
-            this.Name = "MainWindow";
-            this.Text = "J3D_EditAndViewer";
-            this.Load += new System.EventHandler(this.MainWindow_Load);
-            this.MainPanel.ResumeLayout(false);
-            this.MainPanel.PerformLayout();
-            this.GL_Panel.ResumeLayout(false);
-            this.GL_Panel.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(933, 560);
+            Controls.Add(panel1);
+            Controls.Add(MainPanel);
+            Controls.Add(menuStrip1);
+            Controls.Add(splitter1);
+            MainMenuStrip = menuStrip1;
+            Margin = new Padding(4, 3, 4, 3);
+            Name = "MainWindow";
+            Text = "J3D_EditAndViewer";
+            Load += MainWindow_Load;
+            MainPanel.ResumeLayout(false);
+            MainPanel.PerformLayout();
+            GL_Panel.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 

@@ -4,17 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using J3DEditAndViewer.IO;
+using J3DEditorAndViewer.IO;
 using OpenTK;
+// OpenTK
+using OpenTK.GLControl;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+using System.Diagnostics;
+using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData;
+using System.Runtime.InteropServices;
 
-namespace J3DEditAndViewer.FileFormat.SectionFormat
+namespace J3DEditorAndViewer.FileFormat.SectionFormat
 {
     public class SHP1
     {
         private string SectionName;
         private int SectionSize;
-        private short ShapeCount;
 
+        private short ShapeCount;
         private int ShapeDataOffset;
         private int RemapTabelOffset;
         private int NameTableOffset;
@@ -24,7 +31,7 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
         private int MatrixDataOffset;
         private int MatrixGroupTableOffset;
 
-        public struct ShapeData 
+        public struct ShapeData
         {
             public short DisplayFlags;
             public short MatrixGroupCount;
@@ -37,18 +44,42 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
             public Vector3 BoundingBoxMax;
         }
 
-        public struct VertexAttributes 
+        public struct VertexAttributes
         {
             public int AttributeType;
             public int DataType;
         }
 
-        public SHP1() 
+        public struct PrimitiveData
         {
-        
+            public enum PrimitiveTypes : byte
+            {
+                Quads = 0x80,
+                Triangles = 0x90,
+                TriangleStrip = 0x98,
+                TriangleFan = 0xA0,
+                Lines = 0xA8,
+                LineStrip = 0xB0,
+                Point = 0xB8,
+            }
+            public PrimitiveTypes PrimitiveType;
+            public short VertexCount;
+
+            public PrimitiveData(PrimitiveTypes PrimitiveType, short VertexCout)
+            {
+                this.PrimitiveType = PrimitiveType;
+                this.VertexCount = VertexCout;
+            }
         }
 
-        public void Read(BinaryReader br) 
+        private List<PrimitiveData> PrimitiveDatas = new();
+
+        public SHP1()
+        {
+
+        }
+
+        public void Read(BinaryReader br)
         {
             SectionName = Encoding.ASCII.GetString(br.ReadBytes(4));
             SectionSize = BigEndian.ReadInt32(br);
@@ -78,9 +109,14 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
                 shapeData.BoundingBoxMax = J3DFileStreamSys.ReadFloatVector3(br);
             }
 
-            for (int j = 0; j < ShapeCount; j++) 
+            for (int j = 0; j < ShapeCount; j++)
             {
                 var reNameMap = BigEndian.ReadInt16(br);
+            }
+
+            for (int j = 0; j < ShapeCount; j++)
+            {
+                PrimitiveDatas.Add(new PrimitiveData((PrimitiveData.PrimitiveTypes)br.ReadBytes(2)[0], BigEndian.ReadInt16(br)));
             }
 
             J3DFileStreamSys.PaddingSkip(br);
@@ -98,9 +134,9 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
             //    }
             //}
 
-            
 
-            
+
+
 
             Console.WriteLine($"SHP1 End: {br.BaseStream.Position.ToString("X")}");
 
@@ -245,5 +281,77 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
         00 F3 00 AC 00 29 00 0C
          */
 
+        // DEBUG
+
+        private List<uint> GetTriangleIndexesTriangle(in PrimitiveData Primitive, in int CurrentVertexIndex)
+        {
+            List<uint> RetValue = new();
+            foreach (uint vertexIndex in Enumerable.Range(CurrentVertexIndex, Primitive.VertexCount))
+            {
+                RetValue.Add(vertexIndex);
+            }
+            return RetValue;
+        }
+        private List<uint> GetTriangleIndexesTriangleStrip(in PrimitiveData Primitive, in int CurrentVertexIndex)
+        {
+            // 0, 1, 2
+            List<uint> RetValue = GetTriangleIndexesTriangle(Primitive, CurrentVertexIndex);
+            // 3
+            foreach (uint vertexIndex in Enumerable.Range(CurrentVertexIndex, Primitive.VertexCount))
+            {
+                // 現在の頂点要素数を三角頂点の最終要素として、奇数か偶数かによって回転方向を決める。
+                if ((vertexIndex % 2) == 0)
+                {
+                    //順回転
+                    RetValue.AddRange(new uint[] { vertexIndex - 2, vertexIndex - 1, vertexIndex });
+                    continue;
+                }
+                //逆回転
+                RetValue.AddRange(new uint[] { vertexIndex, vertexIndex - 1, vertexIndex - 2 });
+            }
+            return RetValue;
+        }
+        private List<uint> GetTriangleIndexesTriangleFan(in PrimitiveData Primitive, in int CurrentVertexIndex)
+        {
+            // 0, 1, 2
+            List<uint> RetValue = GetTriangleIndexesTriangle(Primitive, CurrentVertexIndex);
+            // 3
+            foreach (uint vertexIndex in Enumerable.Range(CurrentVertexIndex, Primitive.VertexCount))
+            {
+                RetValue.AddRange(new uint[] { 0, vertexIndex - 1, vertexIndex });
+            }
+            return RetValue;
+        }
+
+        public List<uint> GetTriangleindexes()
+        {
+            List<uint> RetValue = new();
+
+            int CurrentVertexIndex = 0;
+
+            for (int CurrentPrim = 0; CurrentPrim < PrimitiveDatas.Count; CurrentPrim++)
+            {
+                switch (PrimitiveDatas[CurrentPrim].PrimitiveType)
+                {
+                    case PrimitiveData.PrimitiveTypes.Triangles:
+                        RetValue.AddRange(GetTriangleIndexesTriangle(PrimitiveDatas[CurrentPrim], CurrentVertexIndex));
+                        Debug.WriteLine("通常△");
+                        break;
+                    case PrimitiveData.PrimitiveTypes.TriangleStrip:
+                        RetValue.AddRange(GetTriangleIndexesTriangleStrip(PrimitiveDatas[CurrentPrim], CurrentVertexIndex));
+                        break;
+                    case PrimitiveData.PrimitiveTypes.TriangleFan:
+                        RetValue.AddRange(GetTriangleIndexesTriangleFan(PrimitiveDatas[CurrentPrim], CurrentVertexIndex));
+                        break;
+                    default:
+                        throw new NotSupportedException($"{PrimitiveDatas[CurrentPrim].PrimitiveType.GetType}の形状データは未対応です。");
+                }
+
+                // データの計算時ではなくこの時点で次の初期インデックスを計算する。
+                CurrentVertexIndex += PrimitiveDatas[CurrentPrim].VertexCount;
+            }
+
+            return RetValue;
+        }
     }
 }

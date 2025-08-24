@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditAndViewer.FileFormat.SectionFormat.VTX1ColorData
+namespace J3DEditorAndViewer.FileFormat.SectionFormat.VTX1ColorData
 {
     public class RGBA6 : IVertexColors
     {

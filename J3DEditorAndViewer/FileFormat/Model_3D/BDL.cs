@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using J3DEditAndViewer.FileFormat;
-using J3DEditAndViewer.FileFormat.SectionFormat;
+using J3DEditorAndViewer.FileFormat;
+using J3DEditorAndViewer.FileFormat.SectionFormat;
 
-namespace J3DEditAndViewer.FileFormat.Model_3D
+namespace J3DEditorAndViewer.FileFormat.Model_3D
 {
     public class BDL : IModel_3D
     {

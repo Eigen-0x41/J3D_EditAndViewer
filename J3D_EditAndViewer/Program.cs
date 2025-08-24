@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace J3DEditAndViewer
+namespace J3DEditorAndViewer
 {
     static class Program
     {

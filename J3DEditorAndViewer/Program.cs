@@ -1,4 +1,4 @@
-using J3DEditAndViewer;
+using J3DEditorAndViewer;
 
 namespace J3DEditorAndViewer
 {

@@ -1,7 +1,11 @@
-﻿using System.IO;
-using OpenTK;
+﻿// OpenTK
+using OpenTK.GLControl;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+//
+using System.IO;
 
-namespace J3DEditAndViewer.FileFormat.SectionFormat.VTX1PrimData
+namespace J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData
 {
     //public interface IPrim<T>:IPrimGet<T>
     //{

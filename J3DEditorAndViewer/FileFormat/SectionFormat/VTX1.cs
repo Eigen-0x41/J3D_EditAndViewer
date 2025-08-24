@@ -1,20 +1,31 @@
-﻿using System;
+﻿// OpenTK
+using OpenTK.GLControl;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+//
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using J3DEditAndViewer.IO;
-using J3DEditAndViewer.FileFormat.SectionFormat.VTX1ColorData;
+using J3DEditorAndViewer.IO;
+using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1ColorData;
 using System.IO.Compression;
-using J3DEditAndViewer.FileFormat.SectionFormat.VTX1PrimData;
-using OpenTK;
+using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData;
 using System.Drawing;
 using System.Diagnostics;
-using OpenTK.Graphics.OpenGL;
 
-namespace J3DEditAndViewer.FileFormat.SectionFormat
+namespace J3DEditorAndViewer.FileFormat.SectionFormat
 {
+
+    public struct VTX1Data
+    {
+        public Vector3 Position;
+        public Vector4 Color0;
+        public Vector4 Color1;
+    };
+
     /*
      * Note:オフセット値の具体的なアドレスは下記です
      * 0x00 4byte VTX1
@@ -42,7 +53,8 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
 
         //private byte VertexAttributeCount;
         private List<(bool, int)> IsReadArray;
-        public List<Vector3>[] Color { get; private set; }
+        public List<Vector4> Color0 { get; private set; }
+        public List<Vector4> Color1 { get; private set; }
         public List<Vector3> Position { get; private set; }
         public List<Vector3> Normal { get; private set; }
         public List<Vector3> Dummy { get; private set; }
@@ -59,7 +71,8 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
 
         public VTX1()
         {
-            Color = new List<Vector3>[2];
+            Color0 = new List<Vector4>();
+            Color1 = new List<Vector4>();
             Position = new List<Vector3>();
             Normal = new List<Vector3>();
             Dummy = new List<Vector3>();
@@ -185,7 +198,6 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
 
             Console.WriteLine(br.BaseStream.Position.ToString("X"));
             //return;
-
             var vertexPosition = SectionBaseAddres;
             Console.WriteLine($"{nameof(_inf1VertexCount)}:{_inf1VertexCount.ToString():X}");
             foreach (var vtx1 in VTX1DataAttributesList.Select((Value, Index) => (Value, Index)))
@@ -209,25 +221,22 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
 
                         for (int i = 0; i < vtx1.Value.GXCompCount; i++)
                         {
-                            // Color[0].Add(GXColorTypes[vtx1.Value.GXCompType].GetColor(br));
-                            GXColorTypes[vtx1.Value.GXCompType].GetColor(br);
+                            Color0.Add(GXColorTypes[vtx1.Value.GXCompType].GetColor(br));
                         }
                         break;
-
                     case GXAttributeTypes.Color1:
                         br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
 
                         for (int i = 0; i < vtx1.Value.GXCompCount; i++)
                         {
-                            // Color[1].Add(GXColorTypes[vtx1.Value.GXCompType].GetColor(br));
-                            GXColorTypes[vtx1.Value.GXCompType].GetColor(br);
+                            Color1.Add(GXColorTypes[vtx1.Value.GXCompType].GetColor(br));
                         }
                         break;
 
                     case GXAttributeTypes.Position:
                         br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
 
-                        for (int j = 0; j < _inf1VertexCount; j++)
+                        for (int j = 0; j < vtx1.Value.GXCompCount; j++)
                         {
                             Position.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br, vtx1.Value.CompShift));
                         }
@@ -236,7 +245,7 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
                     case GXAttributeTypes.Normal:
                         br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
 
-                        for (int j = 0; j < _inf1VertexCount / 3; j++)
+                        for (int j = 0; j < vtx1.Value.GXCompCount; j++)
                         {
                             Normal.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br, vtx1.Value.CompShift));
                         }
@@ -368,6 +377,23 @@ namespace J3DEditAndViewer.FileFormat.SectionFormat
             Console.WriteLine($"VertexAttributeCount: {VTX1DataAttributesList.Count}");
         }
 
+        public VTX1Data[] GetData()
+        {
+            VTX1Data[] retValue = new VTX1Data[Position.Count];
+            for (int i = 0; i < Position.Count; i++)
+            {
+                retValue[i].Position = Position[i];
+            }
+            for (int i = 0; i < Color0.Count; i++)
+            {
+                retValue[i].Color0 = Color0[i];
+            }
+            for (int i = 0; i < Color1.Count; i++)
+            {
+                retValue[i].Color1 = Color1[i];
+            }
+            return retValue;
+        }
 
 
         //private void DataCountAdder(int checArrayCount)

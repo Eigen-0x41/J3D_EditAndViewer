@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.SSBO
+{
+    // WARNING: 実装されない可能性あり。
+    internal class StructSSBOManager : ISSBOManager
+    {
+        public int WriteDefinicator(StringBuilder builder, in int beginIndex = 0) => throw new NotImplementedException();
+        public void Dispose() => throw new NotImplementedException();
+        public void Use() => throw new NotImplementedException();
+    }
+}

@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
-using J3DEditAndViewer.FileFormat;
-using J3DEditAndViewer.FileFormat.Model_3D;
-using J3DEditAndViewer.FileFormat.SectionFormat;
+using J3DEditorAndViewer.FileFormat;
+using J3DEditorAndViewer.FileFormat.Model_3D;
+using J3DEditorAndViewer.FileFormat.SectionFormat;
 
 
-namespace J3DEditAndViewer.IO
+namespace J3DEditorAndViewer.IO
 {
     public class J3DFileDialog
     {

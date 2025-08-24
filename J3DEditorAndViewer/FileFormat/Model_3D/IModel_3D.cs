@@ -1,13 +1,14 @@
 ﻿using System.IO;
-using J3DEditAndViewer.FileFormat.SectionFormat;
+using J3DEditorAndViewer.FileFormat.SectionFormat;
 
-namespace J3DEditAndViewer.FileFormat.Model_3D
+namespace J3DEditorAndViewer.FileFormat.Model_3D
 {
     public interface IModel_3D
     {
         //byte HierarchyDepth { get; }
         INF1 SceneTreeData { get; }
         VTX1 VerTexData { get; }
+        SHP1 ShapeData { get; }
         void Read(FileStream fs);
     }
 }
