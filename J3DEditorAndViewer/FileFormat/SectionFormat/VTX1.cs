@@ -1,29 +1,44 @@
 ﻿// OpenTK
+using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1ColorData;
+using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData;
+using J3DEditorAndViewer.IO;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using J3DEditorAndViewer.IO;
-using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1ColorData;
-using System.IO.Compression;
-using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData;
-using System.Drawing;
-using System.Diagnostics;
 
 namespace J3DEditorAndViewer.FileFormat.SectionFormat
 {
-
+    // ストラクトレイアウト: https://ufcpp.net/study/csharp/interop/memorylayout/#layout-kind
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct VTX1Data
     {
         public Vector3 Position;
         public Vector4 Color0;
         public Vector4 Color1;
+
+        public VTX1Data()
+        {
+            Position = new Vector3(0.0f, 0.0f, 0.0f);
+            Color0 = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+            Color1 = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+        public VTX1Data(float x, float y, float z)
+        {
+            Position = new Vector3(x, y, z);
+            Color0 = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+            Color1 = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+        }
     };
 
     /*
@@ -219,7 +234,7 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
                     case GXAttributeTypes.Color0:
                         br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
 
-                        for (int i = 0; i < vtx1.Value.GXCompCount; i++)
+                        for (int i = 0; i < _inf1VertexCount; i++)
                         {
                             Color0.Add(GXColorTypes[vtx1.Value.GXCompType].GetColor(br));
                         }
@@ -227,7 +242,7 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
                     case GXAttributeTypes.Color1:
                         br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
 
-                        for (int i = 0; i < vtx1.Value.GXCompCount; i++)
+                        for (int i = 0; i < _inf1VertexCount; i++)
                         {
                             Color1.Add(GXColorTypes[vtx1.Value.GXCompType].GetColor(br));
                         }
@@ -236,7 +251,7 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
                     case GXAttributeTypes.Position:
                         br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
 
-                        for (int j = 0; j < vtx1.Value.GXCompCount; j++)
+                        for (int j = 0; j < _inf1VertexCount; j++)
                         {
                             Position.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br, vtx1.Value.CompShift));
                         }
@@ -245,7 +260,7 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
                     case GXAttributeTypes.Normal:
                         br.BaseStream.Seek(IsReadArray.ElementAt((int)vtx1.Value.GXAttr).Item2, SeekOrigin.Begin);
 
-                        for (int j = 0; j < vtx1.Value.GXCompCount; j++)
+                        for (int j = 0; j < _inf1VertexCount / 3; j++)
                         {
                             Normal.Add(GXDataTypes[vtx1.Value.GXCompType].Set(br, vtx1.Value.CompShift));
                         }

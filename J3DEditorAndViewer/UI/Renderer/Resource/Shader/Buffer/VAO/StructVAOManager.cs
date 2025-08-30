@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Diagnostics;
 using System.CodeDom;
+using System.DirectoryServices.ActiveDirectory;
 
 
 namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
@@ -19,7 +20,9 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
     internal class StructVAOManager<InT> : IVAOManager<InT>
         where InT : struct//, IVertexObject
     {
-        private bool _disposed = false;
+        private readonly AutoBindBuffer AutoBinder;
+
+        private bool disposed = false;
         private bool isModified = false;
 
         private InT[] data;
@@ -56,6 +59,8 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
 
         public int WriteDefinicator(StringBuilder builder, in int beginLocation = 0)
         {
+            GL.BindVertexArray(ArrayIndex);
+
             // var MemberInfo = VertexObjectT.MemberNames[location];
             var MembersInfo = typeof(InT).GetFields();
             foreach (int location in Enumerable.Range(beginLocation, MembersInfo.Length))
@@ -67,6 +72,8 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
                 GL.VertexAttribPointer(location, GLSLType.LengthOfType, GLSLType.Type, false, SizeInBytes, Marshal.OffsetOf<InT>(MemberInfo.Name));
                 GL.EnableVertexAttribArray(location);
             }
+
+            GL.BindVertexArray(0);
             // 次の location = X を返す。
             return beginLocation + MembersInfo.Length;
         }
@@ -76,26 +83,31 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
             data = VertexData;
             isModified = true;
 
+
             // BufferObjectの確保。このクラスは構造体を利用するため1つのみ。
             BufferIndex = GL.GenBuffer();
+            AutoBinder = new AutoBindBuffer(BufferTarget.ArrayBuffer, BufferIndex);
             UpdateBuffer();
 
             // ArrayObjectの確保。
             ArrayIndex = GL.GenVertexArray();
-            GL.BindVertexArray(ArrayIndex);
         }
+
         ~StructVAOManager()
         {
-            Dispose();
+            if (!disposed)
+            {
+                throw new Exception("Dispose が呼ばれていません。");
+            }
         }
 
         public void Dispose()
         {
-            if (_disposed) return;
-            _disposed = true;
+            if (disposed) return;
+            disposed = true;
             GL.BindVertexArray(0);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
+            AutoBinder.Dispose();
             GL.DeleteVertexArray(ArrayIndex);
             GL.DeleteBuffer(BufferIndex);
         }
@@ -103,12 +115,14 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
         public void UpdateBuffer()
         {
             if (!isModified) { return; }
-            GL.BindBuffer(BufferTarget.ArrayBuffer, BufferIndex);
+            isModified = false;
             GL.BufferData(BufferTarget.ArrayBuffer, LengthInBytes, data, BufferUsageHint.StaticDraw);
         }
 
         public void Use()
         {
+            AutoBinder.BindOnly();
+            //using var abb = AutoBinder.Use();
             UpdateBuffer();
             GL.BindVertexArray(ArrayIndex);
         }

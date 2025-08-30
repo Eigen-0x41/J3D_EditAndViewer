@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO
 {
-    internal interface IEBOManager : IEBOCommonManager
+    internal interface IEBOCommonManager : IBuffer
     {
-        public uint[] Data { get; set; }
     }
 }

@@ -13,7 +13,9 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO
 {
     internal class TriangleEBOManager : IEBOManager
     {
-        private bool _disposed = false;
+        private readonly AutoBindBuffer AutoBinder;
+
+        private bool disposed = false;
         private bool isModified = false;
 
         public uint[] data;
@@ -36,27 +38,38 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO
 
             // 頂点インデックスバッファを生成
             BufferIndex = GL.GenBuffer();
+
+            AutoBinder = new AutoBindBuffer(BufferTarget.ElementArrayBuffer, BufferIndex);
             UpdateBuffer();
+        }
+
+        ~TriangleEBOManager()
+        {
+            if (!disposed)
+            {
+                throw new Exception("Dispose が呼ばれていません。");
+            }
         }
 
         public void Dispose()
         {
-            if (_disposed) return;
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            if (disposed) { return; }
+            AutoBinder.Dispose();
             GL.DeleteBuffer(BufferIndex);
         }
 
         public void Use()
         {
+            AutoBinder.BindOnly();
+            //using var abb = AutoBinder.Use();
             UpdateBuffer();
             GL.DrawElements(PrimitiveType.Triangles, Data.Length, DrawElementsType.UnsignedInt, 0);
         }
 
-        public void UpdateBuffer()
+        private void UpdateBuffer()
         {
             if (!isModified) { return; }
-            // GL.GenBuffers(1, out VertexBufferObject);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, BufferIndex);
+            isModified = false;
             GL.BufferData(BufferTarget.ElementArrayBuffer, Data.Length * sizeof(uint), Data, BufferUsageHint.StaticDraw);
         }
 

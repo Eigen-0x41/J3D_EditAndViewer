@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource
+namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO
 {
-    internal interface IResource : IDisposable
+    internal interface IUBOCommonManager : IBuffer
     {
-        void Use();
     }
 }

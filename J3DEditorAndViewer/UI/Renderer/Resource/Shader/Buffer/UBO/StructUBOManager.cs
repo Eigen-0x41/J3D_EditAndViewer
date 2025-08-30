@@ -13,17 +13,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.Uniform
+namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO
 {
     // TODO:
-    internal class StructUniformManager<UniformT> : IUniformManager<UniformT>
+    internal class StructUBOManager<UniformT> : IUBOManager<UniformT>
         where UniformT : struct//, IUniform
     {
-        private static int uniqueBufferBindingIndexMaker = 0;
+        private readonly AutoBindBuffer AutoBinder;
 
         private readonly string DefineName;
 
-        private bool _disposed = false;
+        private bool disposed = false;
 
         private UniformT data;
         public ref UniformT Data
@@ -36,12 +36,12 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.Uniform
         private int SizeInBytes = Marshal.SizeOf<UniformT>();
 
         readonly private int BufferIndex;
-        readonly private int UniformBindingIndex;
 
         public int WriteDefinicator(StringBuilder builder, in int beginIndex = 0)
         {
             var membersInfo = typeof(UniformT).GetFields();
             builder.Append($"layout(std140, binding = {beginIndex}) uniform {DefineName} {{\n");
+            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, beginIndex, BufferIndex);
             foreach (int I in Enumerable.Range(0, membersInfo.Length))
             {
                 var memberInfo = membersInfo[I];
@@ -55,44 +55,46 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.Uniform
         }
 
 
-        public StructUniformManager(string defineName, in UniformT uniformData)
+        public StructUBOManager(string defineName, in UniformT uniformData)
         {
             data = uniformData;
-            UniformBindingIndex = uniqueBufferBindingIndexMaker++;
 
             // BufferObjectの確保。
             BufferIndex = GL.GenBuffer();
-            UpdateBuffer();
+
+            AutoBinder = new AutoBindBuffer(BufferTarget.UniformBuffer, BufferIndex);
+            GL.BufferData(BufferTarget.UniformBuffer, SizeInBytes, 0, BufferUsageHint.DynamicDraw);
 
             // DefineNameはlocationによる修飾が無い場合に必要。
             // そうでなくともコンパイルのために必要になる。
             DefineName = defineName;
         }
-        ~StructUniformManager()
+        ~StructUBOManager()
         {
-            Dispose();
+            if (!disposed)
+            {
+                throw new Exception("Dispose が呼ばれていません。");
+            }
         }
 
         public void Dispose()
         {
-            if (_disposed) return;
-            _disposed = true;
-            GL.BindBuffer(BufferTarget.UniformBuffer, 0);
+            if (disposed) return;
+            disposed = true;
+            AutoBinder.Dispose();
             GL.DeleteBuffer(BufferIndex);
         }
 
         private void UpdateBuffer()
         {
-            GL.BindBuffer(BufferTarget.UniformBuffer, BufferIndex);
-            GL.BufferData(BufferTarget.UniformBuffer, SizeInBytes, 0, BufferUsageHint.DynamicDraw);
-
-            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, UniformBindingIndex, BufferIndex);
+            GL.BufferSubData(BufferTarget.UniformBuffer, 0, SizeInBytes, ref data);
         }
 
         public void Use()
         {
-            GL.BindBuffer(BufferTarget.UniformBuffer, BufferIndex);
-            GL.BufferSubData(BufferTarget.UniformBuffer, 0, SizeInBytes, ref data);
+            AutoBinder.BindOnly();
+            //using var abb = AutoBinder.Use();
+            UpdateBuffer();
         }
     }
 }

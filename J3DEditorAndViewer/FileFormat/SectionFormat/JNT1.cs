@@ -42,7 +42,7 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
             jointTransformationData = new List<JointTransformationData>();
         }
 
-        public void Read(BinaryReader br) 
+        public void Read(BinaryReader br)
         {
             BaseAddress = br.BaseStream.Position;
             SectionName = Encoding.ASCII.GetString(br.ReadBytes(4));
@@ -55,7 +55,7 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
 
             Console.WriteLine($"JointCount: {JointCount.ToString("X")}");
 
-            for (int i = 0; i<JointCount; i++) 
+            for (int i = 0; i < JointCount; i++)
             {
                 var jointdata = new JointTransformationData();
 
@@ -75,7 +75,7 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
 
             Console.WriteLine($"JNT1 types End: {br.BaseStream.Position.ToString("X")}");
 
-            for (int j = 0; j<JointCount; j++)
+            for (int j = 0; j < JointCount; j++)
             {
                 BigEndian.ReadInt16(br);
             }
@@ -84,7 +84,7 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
 
             //8バイトに揃えます
             var jointCountByte = JointCount * 2;
-            while (jointCountByte%8 != 0) 
+            while (jointCountByte % 8 != 0)
             {
                 br.ReadBytes(2);
                 jointCountByte += 2;
@@ -94,7 +94,7 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
             var StringCount = BigEndian.ReadInt16(br);
             br.ReadBytes(2);
 
-            for (int k = 0; k<StringCount; k++) 
+            for (int k = 0; k < StringCount; k++)
             {
                 var hash = BigEndian.ReadInt16(br);
                 var offset = BigEndian.ReadInt16(br);
@@ -104,15 +104,15 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
             {
                 string str = string.Empty;
                 List<byte> bytes = new List<byte>();
-                
+
                 //ボーン名を取得します
-                while (true) 
+                while (true)
                 {
                     var bit = br.ReadByte();
-                    
-                    if (bit == 0x00) 
+
+                    if (bit == 0x00)
                     {
-                        
+
                         break;
                     }
                     bytes.Add(bit);
@@ -120,12 +120,13 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
                 Console.WriteLine(Encoding.ASCII.GetString(bytes.ToArray()));
             }
 
+            br.BaseStream.Seek(BaseAddress + SectionSize, SeekOrigin.Begin);
             J3DFileStreamSys.PaddingSkip(br);
             Console.WriteLine($"JNT1 End: {br.BaseStream.Position.ToString("X")}");
         }
 
-        
+
     }
 
-    
+
 }

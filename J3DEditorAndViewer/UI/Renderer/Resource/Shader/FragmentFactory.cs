@@ -3,7 +3,7 @@ using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.Uniform;
+using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,30 +12,35 @@ using System.Threading.Tasks;
 
 namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
 {
-    internal class FragmentFactory<UniformT> : IFragmentFactory
-        where UniformT : struct
+    internal class FragmentFactory : IFragmentFactory
     {
-        private string MethotDefinication;
-        private string Version;
+        bool disposed;
+        private string SourceCode;
 
-        public IUniformManager<UniformT>[] UniformManagers;
+        public IUBOCommonManager[] UniformManagers;
         public ShaderType ShaderType { get { return ShaderType.FragmentShader; } }
 
-        public FragmentFactory(IUniformManager<UniformT>[] uniformManagers, string methotDefinication, string version = "#version 430 core")
+        public FragmentFactory(IUBOCommonManager[] uniformManagers, string sourceCode)
         {
             UniformManagers = uniformManagers;
-            MethotDefinication = methotDefinication + "\n";
-            Version = version + "\n";
+            SourceCode = sourceCode + "\n";
+        }
+        public FragmentFactory(string sourceCode)
+        {
+            UniformManagers = new IUBOCommonManager[] { };
+            SourceCode = sourceCode + "\n";
         }
 
         ~FragmentFactory()
         {
-            Dispose();
+            if (!disposed)
+            {
+                throw new Exception("Dispose が呼ばれていません。");
+            }
         }
 
         public int WriteDefinicator(StringBuilder builder, in int beginIndex)
         {
-            builder.Append(Version);
             int currentIndex = beginIndex;
 
             foreach (var uniform in UniformManagers)
@@ -43,13 +48,15 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
                 currentIndex = uniform.WriteDefinicator(builder, currentIndex);
             }
 
-            builder.Append(MethotDefinication);
+            builder.Append(SourceCode);
 
             return currentIndex;
         }
 
         public void Dispose()
         {
+            if (disposed) { return; }
+            disposed = true;
             foreach (var uniform in UniformManagers)
             {
                 uniform.Dispose();

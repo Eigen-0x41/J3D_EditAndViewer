@@ -1,63 +1,86 @@
 ﻿// OpenTK
+using J3DEditorAndViewer.FileFormat.SectionFormat;
+using J3DEditorAndViewer.IO;
+using J3DEditorAndViewer.UI.Renderer.Resource.Shader;
+using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO;
+using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO;
+using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader;
-using J3DEditorAndViewer.FileFormat.SectionFormat;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.Uniform;
-using J3DEditorAndViewer.IO;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO;
+using System.Windows.Forms;
 
 namespace J3DEditorAndViewer.UI.Renderer
 {
 
     internal class OpenGL4 : IRenderer
     {
+        bool _disposed = false;
+
         //
         // RendererInterface
         public int Width { get; protected set; }
         public int Height { get; protected set; }
 
+        // 以下のコードはテストの為の実装です。
+        // 本来であれば別途のファイルを読み込ませるようにするなど、改修が必要です。
         private static string VShaderCode = @"
-out vec4 Color[2];
+out vec4 VertexColor;
 
 void main() {
-  gl_Position = vec4(Position, 0.0f) * Model * View * Projection;
+  gl_Position =  Projection * View * Model * vec4(Position, 1.0);
 
-  Color[0] = Color0;
-  Color[1] = Color1;
+  //VertexColor = Color0;
+  VertexColor = mix(Color0, Color1, Mixer);
 }
 ";
         private static string FShaderCode = @"
-in vec4 Color[2];
+in vec4 VertexColor;
 
 out vec4 FragColor;
 
 void main() {
-  FragColor = mix(Color[0], Color[1], Mixer);
+  FragColor = VertexColor;
 }
 ";
 
-        public OpenGL4(J3DFileDialog j3d_FileDialog)
+        public OpenGL4(J3DFileDialog j3d_FileDialog, int width, int height)
         {
-            VAOManager = new StructVAOManager<VTX1Data>(j3d_FileDialog.J3DData.Model.VerTexData.GetData());
-            UniformManagerProjection = new StructUniformManager<ProjectionUniform>("CoordinateUniform", new ProjectionUniform());
-            VertexFactory<VTX1Data, ProjectionUniform> vfactory = new(new[] { VAOManager }, new[] { UniformManagerProjection }, VShaderCode);
+            Width = width;
+            Height = height;
 
-            UniformManagerMixer = new StructUniformManager<MixerUniform>("MixerUniform", new MixerUniform());
-            var ffactory = new FragmentFactory<MixerUniform>(new[] { UniformManagerMixer }, FShaderCode);
+            List<VTX1Data> v = new();
+            v.Add(new VTX1Data(0.0f, 0.0f, 0.0f));
+            v.Add(new VTX1Data(0.0f, 0.5f, 0.0f));
+            v.Add(new VTX1Data(0.5f, 0.5f, 0.0f));
+
+            VAOManager = new StructVAOManager<VTX1Data>(j3d_FileDialog.J3DData.Model.VerTexData.GetData());
+            UniformManagerProjection = new StructUBOManager<ProjectionUniform>("CoordinateUniform", new ProjectionUniform());
+            UniformManagerMixer = new StructUBOManager<MixerUniform>("MixerUniform", new MixerUniform());
+            VertexFactory vfactory = new([VAOManager], [UniformManagerProjection, UniformManagerMixer], VShaderCode);
+
+            var ffactory = new FragmentFactory(FShaderCode);
 
             VEOManager = new TriangleEBOManager(j3d_FileDialog.J3DData.Model.ShapeData.GetTriangleindexes().ToArray());
 
             Shader = new J3DShader(vfactory, ffactory);
+
+            // カメラ
+            CameraPosition = new(0.0f, 0.0f, 0.0f);
+            CameraAngle = new(0.0f, 0.0f);
+            CameraDistance = 3.0f;
+        }
+        ~OpenGL4()
+        {
+            Dispose();
         }
 
         public void Reset()
@@ -73,6 +96,8 @@ void main() {
 
         public void Dispose()
         {
+            if (_disposed) return;
+            _disposed = true;
             Shader.Dispose();
             UniformManagerProjection.Dispose();
             UniformManagerMixer.Dispose();
@@ -80,15 +105,14 @@ void main() {
             VEOManager.Dispose();
         }
 
+        // ストラクトレイアウト: https://ufcpp.net/study/csharp/interop/memorylayout/#layout-kind
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        // [StructLayout(LayoutKind.Explicit)]
         struct ProjectionUniform
         {
-            public Matrix4 Model = new();
-            public Matrix4 View = new();
-            public Matrix4 Projection = new();
-
-            public ProjectionUniform()
-            {
-            }
+            public Matrix4 Model;
+            public Matrix4 View;
+            public Matrix4 Projection;
         }
 
         struct MixerUniform
@@ -97,8 +121,8 @@ void main() {
         }
 
         private IVAOManager<VTX1Data> VAOManager;
-        private IUniformManager<ProjectionUniform> UniformManagerProjection;
-        private IUniformManager<MixerUniform> UniformManagerMixer;
+        private IUBOManager<ProjectionUniform> UniformManagerProjection;
+        private IUBOManager<MixerUniform> UniformManagerMixer;
         private IEBOManager VEOManager;
         private IShader Shader;
 
@@ -106,24 +130,31 @@ void main() {
 
         // Camera
         private Vector3 cameraPosition;
-        private Vector2 cameraAxsis;
         private float cameraDistance;
-        public ref Vector3 CameraPosition { get { return ref cameraPosition; } }
-        public ref Vector2 CameraAxsis { get { return ref cameraAxsis; } }
-        public ref float CameraDistance { get { return ref cameraDistance; } }
+        private Vector2 cameraAngle;
+        public ref Vector3 CameraPosition => ref cameraPosition;
+        public ref float CameraDistance => ref cameraDistance;
+        public ref Vector2 CameraAngle => ref cameraAngle;
+
+        private void UpdateModelPosition()
+        {
+            UniformManagerProjection.Data.Model = Matrix4.CreateScale(0.01f);
+        }
+
+        private Quaternion rotate;
 
         private void UpdateViewPosition()
         {
-            Vector3 cameraPos = new Vector3(CameraPosition);
-            cameraPos.X -= CameraDistance * ((float)Math.Cos(CameraAxsis.X) * (float)Math.Cos(CameraAxsis.Y));
-            cameraPos.Y -= CameraDistance * ((float)Math.Sin(CameraAxsis.Y));
-            cameraPos.Z -= CameraDistance * (-(float)Math.Sin(CameraAxsis.X) * (float)Math.Cos(CameraAxsis.Y));
+            Vector3 cameraPos = new(cameraPosition);
+            cameraPos.X -= cameraDistance * ((float)Math.Sin(cameraAngle.Y) * (float)Math.Cos(cameraAngle.X));
+            cameraPos.Y -= cameraDistance * ((float)Math.Sin(cameraAngle.X));
+            cameraPos.Z -= cameraDistance * ((float)Math.Cos(cameraAngle.Y) * (float)Math.Cos(cameraAngle.X));
 
             // カメラの位置を計算して、視点行列を適用。
-            UniformManagerProjection.Data.View = Matrix4.LookAt(cameraPos, CameraPosition, Vector3.UnitY);
+            UniformManagerProjection.Data.View = Matrix4.LookAt(cameraPos + CameraPosition, cameraPosition, Vector3.UnitY);
         }
 
-        private void UpdateProjection(float fovY = 90.0f, float depthNear = 0.1f, float depthFar = 1000.0f)
+        private void UpdateProjection(float fovY = 45.0f, float depthNear = 0.01f, float depthFar = 1000.0f)
         {
             UniformManagerProjection.Data.Projection = Matrix4.CreatePerspectiveFieldOfView(
                 MathHelper.DegreesToRadians(fovY),
@@ -150,16 +181,19 @@ void main() {
             // プログラムの指定。
             Shader.Use();
 
+
             // Uniformデータの更新とセットアップ。
+            UpdateModelPosition();
             UpdateViewPosition();
             UpdateProjection();
             UniformManagerProjection.Use();
 
-            UniformManagerMixer.Data.Mixer = 1.0f;
+            UniformManagerMixer.Data.Mixer = 0.0f;
             UniformManagerMixer.Use();
 
             // 頂点データの指定。
             VAOManager.Use();
+            // 頂点データから描画
             VEOManager.Use();
 
             ///

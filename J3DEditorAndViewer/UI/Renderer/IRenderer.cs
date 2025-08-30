@@ -1,12 +1,12 @@
 ﻿// OpenTK
-using J3DEditorAndViewer.FileFormat.SectionFormat;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.Uniform;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO;
 using OpenTK.GLControl;
 using OpenTK.Mathematics;
 //
+using J3DEditorAndViewer.FileFormat.SectionFormat;
+using J3DEditorAndViewer.UI.Renderer.Resource.Shader;
+using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO;
+using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO;
+using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,8 +24,8 @@ namespace J3DEditorAndViewer.UI.Renderer
 
         // Camera
         ref Vector3 CameraPosition { get; }
-        ref Vector2 CameraAxsis { get; }
         ref float CameraDistance { get; }
+        ref Vector2 CameraAngle { get; }
 
         /// <summary>
         /// DrowとSwapBuffer

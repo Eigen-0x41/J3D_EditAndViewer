@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
 {
-    internal interface IVAOManager<InT> : IVAOCommonManager
-        where InT : struct
+    internal interface IVAOCommonManager : IBuffer
     {
-        public InT[] Data { get; set; }
     }
 }

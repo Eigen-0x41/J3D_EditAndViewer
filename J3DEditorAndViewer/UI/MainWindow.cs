@@ -1,20 +1,8 @@
-﻿//using System.Collections.
+﻿// OpenTK
 using OpenTK.GLControl;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-//using OpenTK;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+//
 using J3DEditorAndViewer.IO;
-using J3DEditorAndViewer.FileFormat;
 using J3DEditorAndViewer.UI.MainWindowSys;
 using J3DEditorAndViewer.UI.Renderer;
 
@@ -22,23 +10,7 @@ namespace J3DEditorAndViewer
 {
     public partial class MainWindow : Form
     {
-        private int vtxcount;
-        private List<Vector3> vertexPosition;
-        private List<Vector3> vertexNormal;
-        private static float _farRange = 64.0f;
-
         IRenderer renderer;
-
-        public float FarRange
-        {
-            get => _farRange;
-            private set
-            {
-                if (value < float.MaxValue && value > float.MaxValue) _farRange = value;
-                if (value > float.MaxValue) _farRange = float.MaxValue;
-                if (value < float.MinValue) _farRange = float.MinValue;
-            }
-        }
 
         public MainWindow()
         {
@@ -65,17 +37,12 @@ namespace J3DEditorAndViewer
             SceneTreeNodeView sceneTreeNodeView = new SceneTreeNodeView(SceneTreeView, J3D_FileDialog.J3DData);
             sceneTreeNodeView.SetTree();
 
-            renderer = new OpenGL4(J3D_FileDialog);
+            renderer?.Dispose();
 
-            vertexPosition = new List<Vector3>();
-            vertexNormal = new List<Vector3>();
-
-            vertexPosition = J3D_FileDialog.J3DData.Model.VerTexData.Position;
-            vertexNormal = J3D_FileDialog.J3DData.Model.VerTexData.Normal;
-
-            Console.WriteLine($"PositionCount: {vertexPosition.Count}");
-            Console.WriteLine($"NormalCount: {vertexNormal.Count}");
+            renderer = new OpenGL4(J3D_FileDialog, glControl.Width, glControl.Height);
             IsModelLoad = true;
+
+            renderer.Update(glControl);
         }
 
         private void SceneTreeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -93,20 +60,18 @@ namespace J3DEditorAndViewer
         private bool IsModelLoad = false;
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
-            if (renderer is null) return;
-            renderer.Update(glControl);
+            renderer?.Update(glControl);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (renderer is null) return;
-            renderer.Update(glControl);
+            renderer?.Update(glControl);
         }
 
         // private Vector3 cameraPosition = new Vector3(0.0f, 0.0f, 0.0f);  // カメラの初期位置
         // private Vector2 cameraRotation = new Vector2(0.0f, 0.0f);  // カメラの初期回転
         // private float cameraDistance = 3.0f;  // カメラの回転軸に対する位置
-        private float cameraSpeed = 0.5f;  // カメラの移動速度
+        private float cameraSpeed = 0.25f;  // カメラの移動速度
 
         private void glControl_KeyDown(object sender, KeyEventArgs e)
         {
@@ -114,23 +79,23 @@ namespace J3DEditorAndViewer
 
             if (e.KeyCode == Keys.W)
             {   // 前に移動
-                renderer.CameraPosition.X += cameraSpeed * (float)Math.Cos(renderer.CameraAxsis.X);
-                renderer.CameraPosition.Z -= cameraSpeed * (float)Math.Sin(renderer.CameraAxsis.X);
+                renderer.CameraPosition.X += cameraSpeed * (float)Math.Cos(renderer.CameraAngle.X);
+                renderer.CameraPosition.Z -= cameraSpeed * (float)Math.Sin(renderer.CameraAngle.X);
             }
             if (e.KeyCode == Keys.S)
             {   // 後ろに移動
-                renderer.CameraPosition.X -= cameraSpeed * (float)Math.Cos(renderer.CameraAxsis.X);
-                renderer.CameraPosition.Z += cameraSpeed * (float)Math.Sin(renderer.CameraAxsis.X);
+                renderer.CameraPosition.X -= cameraSpeed * (float)Math.Cos(renderer.CameraAngle.X);
+                renderer.CameraPosition.Z += cameraSpeed * (float)Math.Sin(renderer.CameraAngle.X);
             }
             if (e.KeyCode == Keys.A)
             {   // 左に移動
-                renderer.CameraPosition.Z -= cameraSpeed * (float)Math.Cos(renderer.CameraAxsis.X);
-                renderer.CameraPosition.X -= cameraSpeed * (float)Math.Sin(renderer.CameraAxsis.X);
+                renderer.CameraPosition.Z -= cameraSpeed * (float)Math.Cos(renderer.CameraAngle.X);
+                renderer.CameraPosition.X -= cameraSpeed * (float)Math.Sin(renderer.CameraAngle.X);
             }
             if (e.KeyCode == Keys.D)
             {   // 右に移動
-                renderer.CameraPosition.Z += cameraSpeed * (float)Math.Cos(renderer.CameraAxsis.X);
-                renderer.CameraPosition.X += cameraSpeed * (float)Math.Sin(renderer.CameraAxsis.X);
+                renderer.CameraPosition.Z += cameraSpeed * (float)Math.Cos(renderer.CameraAngle.X);
+                renderer.CameraPosition.X += cameraSpeed * (float)Math.Sin(renderer.CameraAngle.X);
             }
             if (e.KeyCode == Keys.Q)
             {   // 上に移動
@@ -141,13 +106,15 @@ namespace J3DEditorAndViewer
                 renderer.CameraPosition.Y -= cameraSpeed;
             }
 
-            glControl.Invalidate();  // 描画を更新
+            renderer.Update(glControl);
         }
         private Point BeforeMousePoint = new Point();
         private void glControl_MouseMove(object sender, MouseEventArgs e)
         {
-            float deltaX = e.X - BeforeMousePoint.X;
-            float deltaY = e.Y - BeforeMousePoint.Y;
+            if (renderer is null) return;
+
+            float deltaHorizon = e.X - BeforeMousePoint.X;
+            float deltaVertical = e.Y - BeforeMousePoint.Y;
             BeforeMousePoint = new Point(e.X, e.Y);
 
             if (e.Button != MouseButtons.None)
@@ -156,23 +123,30 @@ namespace J3DEditorAndViewer
                 {
                     case MouseButtons.Left:
 
-                        deltaX *= 0.005f;
-                        deltaY *= 0.005f;
+                        deltaHorizon *= 0.005f;
+                        deltaVertical *= 0.005f;
 
-                        renderer.CameraAxsis.X += deltaX;
-                        renderer.CameraAxsis.Y += deltaY;
+                        renderer.CameraAngle = Quaternion.FromEulerAngles(deltaVertical, deltaHorizon, 0.0f) * renderer.CameraAngle;
+
+                        //const double halfPi = Math.PI * 0.5;
+                        //if (Math.Abs(renderer.CameraAngle.X) > halfPi)
+                        //{
+                        //    renderer.CameraAngle.X = (float)halfPi * ((renderer.CameraAngle.X < 0) ? -0.999f : 0.999f);
+                        //}
+
+                        renderer.CameraAngle.X += deltaVertical;
+                        renderer.CameraAngle.Y += deltaHorizon;
                         const double halfPi = Math.PI * 0.5;
-                        if (Math.Abs(renderer.CameraAxsis.Y) > halfPi)
+                        if (Math.Abs(renderer.CameraAngle.X) > halfPi)
                         {
-                            renderer.CameraAxsis.Y = (float)halfPi * ((renderer.CameraAxsis.Y < 0) ? -0.999f : 0.999f);
+                            renderer.CameraAngle.X = (float)halfPi * ((renderer.CameraAngle.X < 0) ? -0.999f : 0.999f);
                         }
-                        renderer.CameraAxsis = renderer.CameraAxsis;
                         break;
                     case MouseButtons.Right:
                         break;
                 }
-                glControl.Invalidate();  // 描画を更新
             }
+            renderer.Update(glControl);
         }
 
         private void glControl_Load(object sender, EventArgs e)
@@ -191,8 +165,7 @@ namespace J3DEditorAndViewer
         private void glControl_MouseWheel(object sender, MouseEventArgs e)
         {
             renderer.CameraDistance += -0.01f * e.Delta;
-
-            glControl.Update();
+            renderer.Update(glControl);
         }
 
 

@@ -1,4 +1,5 @@
 ﻿// OpenTK
+using J3DEditorAndViewer.FileFormat.SectionFormat;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -7,23 +8,27 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using J3DEditorAndViewer.FileFormat.SectionFormat;
 
 namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
 {
     internal class J3DShader : IShader
     {
-        private bool _disposed = false;
+        private bool disposed = false;
 
         private int Handle;
+        private readonly string Version = "#version 430 core\n";
 
-        private static (int, int) ShaderCompilerVertex(IVertexFactory res)
+        private IVertexFactory VertexFactory;
+        private IFragmentFactory FragmentFactory;
+
+        private (int, int) ShaderCompilerVertex(IVertexFactory res)
         {
             int shaderID = GL.CreateShader(ShaderType.VertexShader);
 
-            StringBuilder builder = new();
+            StringBuilder builder = new(Version);
             int bindingID = res.WriteDefinicator(builder);
 
             Debug.WriteLine($"Shader Source:\n{builder.ToString()}");
@@ -32,17 +37,16 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
             GL.GetShader(shaderID, ShaderParameter.CompileStatus, out int success);
             if (success == 0)
             {
-                string infoLog = GL.GetShaderInfoLog(shaderID);
-                Debug.WriteLine(infoLog);
+                Debug.Assert(success != 0, GL.GetShaderInfoLog(shaderID));
             }
 
             return (shaderID, bindingID);
         }
-        private static int ShaderCompilerFragment(IFragmentFactory res, int bindingID)
+        private int ShaderCompilerFragment(IFragmentFactory res, int bindingID)
         {
             int shaderID = GL.CreateShader(ShaderType.FragmentShader);
 
-            StringBuilder builder = new();
+            StringBuilder builder = new(Version);
             res.WriteDefinicator(builder, bindingID);
 
             Debug.WriteLine($"Shader Source:\n{builder.ToString()}");
@@ -51,8 +55,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
             GL.GetShader(shaderID, ShaderParameter.CompileStatus, out int success);
             if (success == 0)
             {
-                string infoLog = GL.GetShaderInfoLog(shaderID);
-                Debug.WriteLine(infoLog);
+                Debug.Assert(success != 0, GL.GetShaderInfoLog(shaderID));
             }
 
             return shaderID;
@@ -61,19 +64,18 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
         private static int ShaderLinker(int vertex, int fragment)
         {
             int handle = GL.CreateProgram();
+
+            GL.AttachShader(handle, vertex);
+            GL.AttachShader(handle, fragment);
+
+            GL.LinkProgram(handle);
+
+            GL.GetProgram(handle, GetProgramParameterName.LinkStatus, out int success);
+            if (success == 0)
             {
-                GL.AttachShader(handle, vertex);
-                GL.AttachShader(handle, fragment);
-
-                GL.LinkProgram(handle);
-
-                GL.GetProgram(handle, GetProgramParameterName.LinkStatus, out int success);
-                if (success == 0)
-                {
-                    string infoLog = GL.GetProgramInfoLog(handle);
-                    Debug.WriteLine(infoLog);
-                }
+                Debug.Assert(success != 0, GL.GetProgramInfoLog(handle));
             }
+
 
             GL.DetachShader(handle, vertex);
             GL.DetachShader(handle, fragment);
@@ -84,28 +86,36 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
             return handle;
         }
 
+        private int ShaderBuilder()
+        {
+            (int vertexShader, int bindingID) = ShaderCompilerVertex(VertexFactory);
+            int fragmentShader = ShaderCompilerFragment(FragmentFactory, bindingID);
+
+            return ShaderLinker(vertexShader, fragmentShader);
+        }
+
         public J3DShader(IVertexFactory vertexFactory, IFragmentFactory fragmentFactory)
         {
-            _disposed = false;
-
-            (int vertexShader, int bindingID) = ShaderCompilerVertex(vertexFactory);
-            int fragmentShader = fragmentShader = ShaderCompilerFragment(fragmentFactory, bindingID);
-
-            Handle = ShaderLinker(vertexShader, fragmentShader);
+            VertexFactory = vertexFactory;
+            FragmentFactory = fragmentFactory;
+            Handle = ShaderBuilder();
         }
 
         ~J3DShader()
         {
-            Dispose();
+            if (!disposed)
+            {
+                throw new Exception("Dispose が呼ばれていません。");
+            }
         }
 
         public void Dispose()
         {
-            if (!_disposed)
+            if (!disposed)
             {
                 GL.DeleteProgram(Handle);
             }
-            _disposed = true;
+            disposed = true;
 
             GC.SuppressFinalize(this);
         }
