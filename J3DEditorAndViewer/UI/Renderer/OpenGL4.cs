@@ -36,7 +36,7 @@ namespace J3DEditorAndViewer.UI.Renderer
 out vec4 VertexColor;
 
 void main() {
-  gl_Position =  Projection * View * Model * vec4(Position, 1.0);
+  gl_Position = Projection * View * Model * vec4(Position, 1.0);
 
   //VertexColor = Color0;
   VertexColor = mix(Color0, Color1, Mixer);
@@ -145,13 +145,17 @@ void main() {
 
         private void UpdateViewPosition()
         {
-            Vector3 cameraPos = new(cameraPosition);
-            cameraPos.X -= cameraDistance * ((float)Math.Sin(cameraAngle.Y) * (float)Math.Cos(cameraAngle.X));
-            cameraPos.Y -= cameraDistance * ((float)Math.Sin(cameraAngle.X));
-            cameraPos.Z -= cameraDistance * ((float)Math.Cos(cameraAngle.Y) * (float)Math.Cos(cameraAngle.X));
+            //Vector3 cameraPos = new(cameraPosition);
+            //cameraPos.X -= cameraDistance * ((float)Math.Sin(cameraAngle.Y) * (float)Math.Cos(cameraAngle.X));
+            //cameraPos.Y -= cameraDistance * ((float)Math.Sin(cameraAngle.X));
+            //cameraPos.Z -= cameraDistance * ((float)Math.Cos(cameraAngle.Y) * (float)Math.Cos(cameraAngle.X));
+
+            Vector3 cameraPos = new Vector3(0.0f, 0.0f, cameraDistance);
+            cameraPos = Quaternion.FromAxisAngle(Vector3.UnitX, cameraAngle.X) * cameraPos;
+            cameraPos = Quaternion.FromAxisAngle(Vector3.UnitY, cameraAngle.Y) * cameraPos;
 
             // カメラの位置を計算して、視点行列を適用。
-            UniformManagerProjection.Data.View = Matrix4.LookAt(cameraPos + CameraPosition, cameraPosition, Vector3.UnitY);
+            UniformManagerProjection.Data.View = Matrix4.LookAt(cameraPos + cameraPosition, cameraPosition, Vector3.UnitY);
         }
 
         private void UpdateProjection(float fovY = 45.0f, float depthNear = 0.01f, float depthFar = 1000.0f)

@@ -75,27 +75,27 @@ namespace J3DEditorAndViewer
 
         private void glControl_KeyDown(object sender, KeyEventArgs e)
         {
-            if (renderer is null) return;
+            if (renderer is null) { return; }
 
             if (e.KeyCode == Keys.W)
             {   // 前に移動
-                renderer.CameraPosition.X += cameraSpeed * (float)Math.Cos(renderer.CameraAngle.X);
-                renderer.CameraPosition.Z -= cameraSpeed * (float)Math.Sin(renderer.CameraAngle.X);
+                renderer.CameraPosition.X -= cameraSpeed * (float)Math.Sin(renderer.CameraAngle.Y);
+                renderer.CameraPosition.Z -= cameraSpeed * (float)Math.Cos(renderer.CameraAngle.Y);
             }
             if (e.KeyCode == Keys.S)
             {   // 後ろに移動
-                renderer.CameraPosition.X -= cameraSpeed * (float)Math.Cos(renderer.CameraAngle.X);
-                renderer.CameraPosition.Z += cameraSpeed * (float)Math.Sin(renderer.CameraAngle.X);
+                renderer.CameraPosition.X += cameraSpeed * (float)Math.Sin(renderer.CameraAngle.Y);
+                renderer.CameraPosition.Z += cameraSpeed * (float)Math.Cos(renderer.CameraAngle.Y);
             }
             if (e.KeyCode == Keys.A)
             {   // 左に移動
-                renderer.CameraPosition.Z -= cameraSpeed * (float)Math.Cos(renderer.CameraAngle.X);
-                renderer.CameraPosition.X -= cameraSpeed * (float)Math.Sin(renderer.CameraAngle.X);
+                renderer.CameraPosition.Z += cameraSpeed * (float)Math.Sin(renderer.CameraAngle.Y);
+                renderer.CameraPosition.X -= cameraSpeed * (float)Math.Cos(renderer.CameraAngle.Y);
             }
             if (e.KeyCode == Keys.D)
             {   // 右に移動
-                renderer.CameraPosition.Z += cameraSpeed * (float)Math.Cos(renderer.CameraAngle.X);
-                renderer.CameraPosition.X += cameraSpeed * (float)Math.Sin(renderer.CameraAngle.X);
+                renderer.CameraPosition.Z -= cameraSpeed * (float)Math.Sin(renderer.CameraAngle.Y);
+                renderer.CameraPosition.X += cameraSpeed * (float)Math.Cos(renderer.CameraAngle.Y);
             }
             if (e.KeyCode == Keys.Q)
             {   // 上に移動
