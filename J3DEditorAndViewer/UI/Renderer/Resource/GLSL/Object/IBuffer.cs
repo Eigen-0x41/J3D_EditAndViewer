@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object
 {
     internal interface IBuffer : IFactory
     {
-        int WriteDefinicator(StringBuilder builder, in int beginIndex = 0);
+        int WriteDefinicator(StringBuilder builder, Type.IGLSLTypeTraits typeTrait, in int beginIndex = 0);
     }
 }

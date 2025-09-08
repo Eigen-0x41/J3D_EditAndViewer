@@ -13,14 +13,15 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Diagnostics;
 using System.CodeDom;
 using System.DirectoryServices.ActiveDirectory;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO
 {
     internal class StructVAOManager<InT> : IVAOManager<InT>
         where InT : struct//, IVertexObject
     {
-        private readonly AutoBindBuffer AutoBinder;
+        private readonly IAutoBindBuffer AutoBinder;
 
         private bool disposed = false;
         private bool isModified = false;
@@ -57,7 +58,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
         readonly private int BufferIndex;
         readonly private int ArrayIndex;
 
-        public int WriteDefinicator(StringBuilder builder, in int beginLocation = 0)
+        public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, in int beginLocation = 0)
         {
             GL.BindVertexArray(ArrayIndex);
 
@@ -66,7 +67,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO
             foreach (int location in Enumerable.Range(beginLocation, MembersInfo.Length))
             {
                 var MemberInfo = MembersInfo[location];
-                var GLSLType = new TypeGLSL(MemberInfo.FieldType);
+                IGLSLType GLSLType = typeTrait.TypeOf(MemberInfo.FieldType);
 
                 builder.Append($"layout(location = {location}) in {GLSLType.Name} {MemberInfo.Name};\n");
                 GL.VertexAttribPointer(location, GLSLType.LengthOfType, GLSLType.Type, false, SizeInBytes, Marshal.OffsetOf<InT>(MemberInfo.Name));

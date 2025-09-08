@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO
 {
     internal interface IUBOManager<UniformT> : IUBOCommonManager
         where UniformT : struct

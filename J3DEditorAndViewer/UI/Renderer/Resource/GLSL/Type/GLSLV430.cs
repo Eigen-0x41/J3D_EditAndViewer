@@ -3,18 +3,13 @@ using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type
 {
-    internal class TypeGLSL
+    internal sealed class GLSLV430 : IGLSLType
     {
-        private static readonly Dictionary<Type, (string, VertexAttribPointerType, int)> Infomatons =
+        private static readonly Dictionary<System.Type, (string, VertexAttribPointerType, int)> Infomatons =
             new() {
                 {typeof(bool)   , ("bool"  , VertexAttribPointerType.Byte       , 1    )},
                 {typeof(int)    , ("int"   , VertexAttribPointerType.Int        , 1    )},
@@ -29,23 +24,26 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
                 {typeof(Matrix4), ("mat4"  , VertexAttribPointerType.Float      , 4 * 4)},
             };
 
-        public readonly string Name;
-        public readonly VertexAttribPointerType Type;
-        public readonly int LengthOfType;
+        public string Name { get; private init; }
+        public VertexAttribPointerType Type { get; private init; }
+        public int LengthOfType { get; private init; }
 
-        public TypeGLSL(Type type)
+        public GLSLV430(System.Type type)
         {
             // NOTE: GetTryValueが遅い場合、分岐を無くしてもいいかもしれない。
-            if (!Infomatons.ContainsKey(type))
+            if (!Infomatons.TryGetValue(type, out var info))
             {
                 throw new KeyNotFoundException("指定された型はGLSL組み込み型として登録されていません。");
             }
 
-            var info = Infomatons[type];
-
             Name = info.Item1;
             Type = info.Item2;
             LengthOfType = info.Item3;
+        }
+
+        public IGLSLType TypeOf(System.Type type)
+        {
+            return new GLSLV430(type);
         }
     }
 }

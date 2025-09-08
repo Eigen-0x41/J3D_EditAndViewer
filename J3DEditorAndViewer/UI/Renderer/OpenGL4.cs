@@ -1,10 +1,11 @@
 ﻿// OpenTK
 using J3DEditorAndViewer.FileFormat.SectionFormat;
 using J3DEditorAndViewer.IO;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO;
-using J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.VAO;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.EBO;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -62,16 +63,17 @@ void main() {
             v.Add(new VTX1Data(0.0f, 0.5f, 0.0f));
             v.Add(new VTX1Data(0.5f, 0.5f, 0.0f));
 
+            glslTypeTrait = new GLSLV430Traits();
             VAOManager = new StructVAOManager<VTX1Data>(j3d_FileDialog.J3DData.Model.VerTexData.GetData());
             UniformManagerProjection = new StructUBOManager<ProjectionUniform>("CoordinateUniform", new ProjectionUniform());
             UniformManagerMixer = new StructUBOManager<MixerUniform>("MixerUniform", new MixerUniform());
-            VertexFactory vfactory = new([VAOManager], [UniformManagerProjection, UniformManagerMixer], VShaderCode);
+            VertexFactory = new VertexFactory([VAOManager], [UniformManagerProjection, UniformManagerMixer], glslTypeTrait, VShaderCode);
 
-            var ffactory = new FragmentFactory(FShaderCode);
+            FragmentFactory = new FragmentFactory(glslTypeTrait, FShaderCode);
 
             VEOManager = new TriangleEBOManager(j3d_FileDialog.J3DData.Model.ShapeData.GetTriangleindexes().ToArray());
 
-            Shader = new J3DShader(vfactory, ffactory);
+            Shader = new J3DShader(VertexFactory, FragmentFactory);
 
             // カメラ
             CameraPosition = new(0.0f, 0.0f, 0.0f);
@@ -120,10 +122,13 @@ void main() {
             public float Mixer;
         }
 
+        private IGLSLTypeTraits glslTypeTrait;
         private IVAOManager<VTX1Data> VAOManager;
         private IUBOManager<ProjectionUniform> UniformManagerProjection;
         private IUBOManager<MixerUniform> UniformManagerMixer;
         private IEBOManager VEOManager;
+        private IVertexFactory VertexFactory;
+        private IFragmentFactory FragmentFactory;
         private IShader Shader;
 
 

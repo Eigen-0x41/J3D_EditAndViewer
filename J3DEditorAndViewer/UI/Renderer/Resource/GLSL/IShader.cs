@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL
 {
-    internal interface IEBOCommonManager : IBuffer
+    internal interface IShader : IResource
     {
     }
 }

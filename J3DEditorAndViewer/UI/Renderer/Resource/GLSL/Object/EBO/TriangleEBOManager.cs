@@ -1,4 +1,5 @@
 ﻿// OpenTK
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -9,11 +10,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.EBO
 {
     internal class TriangleEBOManager : IEBOManager
     {
-        private readonly AutoBindBuffer AutoBinder;
+        private readonly IAutoBindBuffer AutoBinder;
 
         private bool disposed = false;
         private bool isModified = false;
@@ -73,7 +74,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.EBO
             GL.BufferData(BufferTarget.ElementArrayBuffer, Data.Length * sizeof(uint), Data, BufferUsageHint.StaticDraw);
         }
 
-        public int WriteDefinicator(StringBuilder builder, in int beginIndex = 0)
+        public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, in int beginIndex = 0)
         {
             // シェーダコードに関わらないため実装しません。
             throw new NotImplementedException();

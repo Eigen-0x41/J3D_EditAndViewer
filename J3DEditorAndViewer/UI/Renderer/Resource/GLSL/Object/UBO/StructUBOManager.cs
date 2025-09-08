@@ -12,14 +12,15 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO
 {
     // TODO:
     internal class StructUBOManager<UniformT> : IUBOManager<UniformT>
         where UniformT : struct//, IUniform
     {
-        private readonly AutoBindBuffer AutoBinder;
+        private readonly IAutoBindBuffer AutoBinder;
 
         private readonly string DefineName;
 
@@ -37,7 +38,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO
 
         readonly private int BufferIndex;
 
-        public int WriteDefinicator(StringBuilder builder, in int beginIndex = 0)
+        public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, in int beginIndex = 0)
         {
             var membersInfo = typeof(UniformT).GetFields();
             builder.Append($"layout(std140, binding = {beginIndex}) uniform {DefineName} {{\n");
@@ -45,7 +46,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader.Buffer.UBO
             foreach (int I in Enumerable.Range(0, membersInfo.Length))
             {
                 var memberInfo = membersInfo[I];
-                var typeGLSL = new TypeGLSL(memberInfo.FieldType);
+                IGLSLType typeGLSL = typeTrait.TypeOf(memberInfo.FieldType);
 
                 builder.Append($"  {typeGLSL.Name} {memberInfo.Name};\n");
             }

@@ -12,7 +12,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL
 {
     internal class J3DShader : IShader
     {

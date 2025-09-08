@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.Shader
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL
 {
-    internal interface IShader : IResource
+    internal interface IFactory : IResource
     {
     }
 }
