@@ -14,11 +14,14 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type
                 {typeof(bool)    , ("bool"  , VertexAttribPointerType.Byte       , 1    )},
 
                 {typeof(int)     , ("int"   , VertexAttribPointerType.Int        , 1    )},
-                {typeof(Vector2i), ("vec2"  , VertexAttribPointerType.Int        , 2    )},
-                {typeof(Vector3i), ("vec3"  , VertexAttribPointerType.Int        , 3    )},
-                {typeof(Vector4i), ("vec4"  , VertexAttribPointerType.Int        , 4    )},
+                {typeof(Vector2i), ("ivec2" , VertexAttribPointerType.Int        , 2    )},
+                {typeof(Vector3i), ("ivec3" , VertexAttribPointerType.Int        , 3    )},
+                {typeof(Vector4i), ("ivec4" , VertexAttribPointerType.Int        , 4    )},
 
                 {typeof(uint)    , ("uint"  , VertexAttribPointerType.UnsignedInt, 1    )},
+                // {typeof(Vector2u), ("uvec2" , VertexAttribPointerType.UnsignedInt, 2    )},
+                // {typeof(Vector3u), ("uvec3" , VertexAttribPointerType.UnsignedInt, 3    )},
+                // {typeof(Vector4u), ("uvec4" , VertexAttribPointerType.UnsignedInt, 4    )},
 
                 {typeof(float)   , ("float" , VertexAttribPointerType.Float      , 1    )},
                 {typeof(Vector2) , ("vec2"  , VertexAttribPointerType.Float      , 2    )},
@@ -29,12 +32,12 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type
                 {typeof(Matrix4) , ("mat4"  , VertexAttribPointerType.Float      , 4 * 4)},
 
                 {typeof(double)  , ("double", VertexAttribPointerType.Double     , 1    )},
-                {typeof(Vector2d), ("vec2"  , VertexAttribPointerType.Double     , 2    )},
-                {typeof(Vector3d), ("vec3"  , VertexAttribPointerType.Double     , 3    )},
-                {typeof(Vector4d), ("vec4"  , VertexAttribPointerType.Double     , 4    )},
-                {typeof(Matrix2d), ("mat2"  , VertexAttribPointerType.Double     , 2 * 2)},
-                {typeof(Matrix3d), ("mat3"  , VertexAttribPointerType.Double     , 3 * 3)},
-                {typeof(Matrix4d), ("mat4"  , VertexAttribPointerType.Double     , 4 * 4)},
+                {typeof(Vector2d), ("dvec2" , VertexAttribPointerType.Double     , 2    )},
+                {typeof(Vector3d), ("dvec3" , VertexAttribPointerType.Double     , 3    )},
+                {typeof(Vector4d), ("dvec4" , VertexAttribPointerType.Double     , 4    )},
+                // {typeof(Matrix2d), ("dmat2" , VertexAttribPointerType.Double     , 2 * 2)},
+                // {typeof(Matrix3d), ("dmat3" , VertexAttribPointerType.Double     , 3 * 3)},
+                // {typeof(Matrix4d), ("dmat4" , VertexAttribPointerType.Double     , 4 * 4)},
             };
 
         public string Name { get; private init; }
