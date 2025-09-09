@@ -11,17 +11,30 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type
     {
         private static readonly Dictionary<System.Type, (string, VertexAttribPointerType, int)> Infomatons =
             new() {
-                {typeof(bool)   , ("bool"  , VertexAttribPointerType.Byte       , 1    )},
-                {typeof(int)    , ("int"   , VertexAttribPointerType.Int        , 1    )},
-                {typeof(uint)   , ("uint"  , VertexAttribPointerType.UnsignedInt, 1    )},
-                {typeof(float)  , ("float" , VertexAttribPointerType.Float      , 1    )},
-                {typeof(double) , ("double", VertexAttribPointerType.Double     , 1    )},
-                {typeof(Vector2), ("vec2"  , VertexAttribPointerType.Float      , 2    )},
-                {typeof(Vector3), ("vec3"  , VertexAttribPointerType.Float      , 3    )},
-                {typeof(Vector4), ("vec4"  , VertexAttribPointerType.Float      , 4    )},
-                {typeof(Matrix2), ("mat2"  , VertexAttribPointerType.Float      , 2 * 2)},
-                {typeof(Matrix3), ("mat3"  , VertexAttribPointerType.Float      , 3 * 3)},
-                {typeof(Matrix4), ("mat4"  , VertexAttribPointerType.Float      , 4 * 4)},
+                {typeof(bool)    , ("bool"  , VertexAttribPointerType.Byte       , 1    )},
+
+                {typeof(int)     , ("int"   , VertexAttribPointerType.Int        , 1    )},
+                {typeof(Vector2i), ("vec2"  , VertexAttribPointerType.Int        , 2    )},
+                {typeof(Vector3i), ("vec3"  , VertexAttribPointerType.Int        , 3    )},
+                {typeof(Vector4i), ("vec4"  , VertexAttribPointerType.Int        , 4    )},
+
+                {typeof(uint)    , ("uint"  , VertexAttribPointerType.UnsignedInt, 1    )},
+
+                {typeof(float)   , ("float" , VertexAttribPointerType.Float      , 1    )},
+                {typeof(Vector2) , ("vec2"  , VertexAttribPointerType.Float      , 2    )},
+                {typeof(Vector3) , ("vec3"  , VertexAttribPointerType.Float      , 3    )},
+                {typeof(Vector4) , ("vec4"  , VertexAttribPointerType.Float      , 4    )},
+                {typeof(Matrix2) , ("mat2"  , VertexAttribPointerType.Float      , 2 * 2)},
+                {typeof(Matrix3) , ("mat3"  , VertexAttribPointerType.Float      , 3 * 3)},
+                {typeof(Matrix4) , ("mat4"  , VertexAttribPointerType.Float      , 4 * 4)},
+
+                {typeof(double)  , ("double", VertexAttribPointerType.Double     , 1    )},
+                {typeof(Vector2d), ("vec2"  , VertexAttribPointerType.Double     , 2    )},
+                {typeof(Vector3d), ("vec3"  , VertexAttribPointerType.Double     , 3    )},
+                {typeof(Vector4d), ("vec4"  , VertexAttribPointerType.Double     , 4    )},
+                {typeof(Matrix2d), ("mat2"  , VertexAttribPointerType.Double     , 2 * 2)},
+                {typeof(Matrix3d), ("mat3"  , VertexAttribPointerType.Double     , 3 * 3)},
+                {typeof(Matrix4d), ("mat4"  , VertexAttribPointerType.Double     , 4 * 4)},
             };
 
         public string Name { get; private init; }

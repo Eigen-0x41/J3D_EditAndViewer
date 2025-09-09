@@ -58,11 +58,6 @@ void main() {
             Width = width;
             Height = height;
 
-            List<VTX1Data> v = new();
-            v.Add(new VTX1Data(0.0f, 0.0f, 0.0f));
-            v.Add(new VTX1Data(0.0f, 0.5f, 0.0f));
-            v.Add(new VTX1Data(0.5f, 0.5f, 0.0f));
-
             glslTypeTrait = new GLSLV430Traits();
             VAOManager = new StructVAOManager<VTX1Data>(j3d_FileDialog.J3DData.Model.VerTexData.GetData());
             UniformManagerProjection = new StructUBOManager<ProjectionUniform>("CoordinateUniform", new ProjectionUniform());
