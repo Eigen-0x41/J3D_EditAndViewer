@@ -10,7 +10,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO
 {
     // TODO: typeof().GetMembers()が上手く動作しなかった時のために残しています。
     

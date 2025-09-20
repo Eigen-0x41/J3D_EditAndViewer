@@ -16,22 +16,18 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object
     /// ブロックでのBindBuffer動作を楽に実装するためのクラス。<br/>
     /// クラスでの使用を除き、基本using束縛して使用して下さい。
     /// </summary>
-    internal sealed class AutoBufferBinder : IAutoObjectBinder
+    internal sealed class AutoVartexArrayBinder : IAutoObjectBinder
     {
-        static bool isUsing;
-        bool disposed;
+        internal bool disposed;
 
-        public readonly BufferTarget BufferTarget;
-        public readonly int BufferIndex;
+        internal readonly int Handle;
 
-        public AutoBufferBinder(BufferTarget bufferTarget, int bufferIndex)
+        public AutoVartexArrayBinder(int bufferIndex)
         {
-            isUsing = true;
-            BufferTarget = bufferTarget;
-            BufferIndex = bufferIndex;
-            GL.BindBuffer(BufferTarget, BufferIndex);
+            Handle = bufferIndex;
+            GL.BindVertexArray(Handle);
         }
-        ~AutoBufferBinder()
+        ~AutoVartexArrayBinder()
         {
             if (!disposed)
             {
@@ -43,15 +39,14 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object
         {
             if (disposed) return;
             disposed = true;
-            isUsing = false;
-            GL.BindBuffer(BufferTarget, 0);
+            GL.BindVertexArray(0);
         }
 
-        public IAutoObjectBinder MoveObject()
-        {
-            if (disposed == true) throw new ObjectDisposedException(GetType().Name);
-            disposed = true;
-            return new AutoBufferBinder(BufferTarget, BufferIndex);
-        }
+        public IAutoObjectBinder MoveObject() => throw new NotImplementedException();
+        //{
+        //    if (disposed == true) throw new ObjectDisposedException(GetType().Name);
+        //    disposed = true;
+        //    return new AutoObjectBinder(BufferTarget, BufferIndex);
+        //}
     }
 }

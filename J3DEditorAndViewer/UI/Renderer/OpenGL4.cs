@@ -2,9 +2,10 @@
 using J3DEditorAndViewer.FileFormat.SectionFormat;
 using J3DEditorAndViewer.IO;
 using J3DEditorAndViewer.UI.Renderer.Resource.GLSL;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.EBO;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Array.VAO;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.EBO;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.UBO;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO;
 using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
@@ -60,11 +61,14 @@ void main() {
             Height = height;
 
             glslTypeTrait = new GLSLV430Traits();
-            VAOManager = new StructVAOManager<VTX1Data>(j3d_FileDialog.J3DData.Model.VerTexData.GetData());
+
+            VBOManager = new StructVBOManager<VTX1Data>(j3d_FileDialog.J3DData.Model.VerTexData.GetData());
+            VAOCommonManager = new VAOManager([VBOManager]);
+
             UniformManagerProjection = new StructUBOManager<ProjectionUniform>("CoordinateUniform", new ProjectionUniform());
             UniformManagerMixer = new StructUBOManager<MixerUniform>("MixerUniform", new MixerUniform());
-            VertexFactory = new VertexFactory(VAOManager, [UniformManagerProjection, UniformManagerMixer], glslTypeTrait, VShaderCode);
 
+            VertexFactory = new VertexFactory(VAOCommonManager, [UniformManagerProjection, UniformManagerMixer], glslTypeTrait, VShaderCode);
             FragmentFactory = new FragmentFactory(glslTypeTrait, FShaderCode);
 
             VEOManager = new TriangleEBOManager(j3d_FileDialog.J3DData.Model.ShapeData.GetTriangleindexes().ToArray());
@@ -99,7 +103,8 @@ void main() {
             Shader.Dispose();
             UniformManagerProjection.Dispose();
             UniformManagerMixer.Dispose();
-            VAOManager.Dispose();
+            VAOCommonManager.Dispose();
+            VBOManager.Dispose();
             VEOManager.Dispose();
         }
 
@@ -118,8 +123,10 @@ void main() {
             public float Mixer;
         }
 
+        // これらオブジェクト系列はdispose挙動の見直しが必要。
         private IGLSLTypeTraits glslTypeTrait;
-        private IVAOManager<VTX1Data> VAOManager;
+        private IVBOManager<VTX1Data> VBOManager;
+        private IVAOCommonManager VAOCommonManager;
         private IUBOManager<ProjectionUniform> UniformManagerProjection;
         private IUBOManager<MixerUniform> UniformManagerMixer;
         private IEBOManager VEOManager;
@@ -197,9 +204,7 @@ void main() {
             UniformManagerMixer.Use();
 
             // 頂点データの指定。
-            VAOManager.Use();
-            // 頂点データから描画
-            VEOManager.Use();
+            VAOCommonManager.Use(VEOManager);
 
             ///
             ///

@@ -3,7 +3,7 @@ using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
-using J3DEditorAndViewer.FileFormat.SectionFormat;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,16 +12,13 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.UBO
 {
     // TODO:
     internal class StructUBOManager<UniformT> : IUBOManager<UniformT>
         where UniformT : struct//, IUniform
     {
-        private readonly IAutoBindBuffer AutoBinder;
-
         private readonly string DefineName;
 
         private bool disposed = false;
@@ -37,6 +34,11 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO
         private int SizeInBytes = Marshal.SizeOf<UniformT>();
 
         readonly private int BufferIndex;
+
+        private IAutoObjectBinder CreateObjectBinder()
+        {
+            return new AutoUniformBufferBinder(BufferIndex);
+        }
 
         public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, int location = 0)
         {
@@ -64,7 +66,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO
             // BufferObjectの確保。
             BufferIndex = GL.GenBuffer();
 
-            AutoBinder = new AutoBindBuffer(BufferTarget.UniformBuffer, BufferIndex);
+            using var aob = CreateObjectBinder();
             GL.BufferData(BufferTarget.UniformBuffer, SizeInBytes, 0, BufferUsageHint.DynamicDraw);
 
             // DefineNameはlocationによる修飾が無い場合に必要。
@@ -83,19 +85,21 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO
         {
             if (disposed) return;
             disposed = true;
-            AutoBinder.Dispose();
             GL.DeleteBuffer(BufferIndex);
         }
 
-        private void UpdateBuffer()
+        private void UpdateBuffer(IAutoObjectBinder aob)
         {
             GL.BufferSubData(BufferTarget.UniformBuffer, 0, SizeInBytes, ref data);
+        }
+        private void UpdateBuffer()
+        {
+            using var aob = CreateObjectBinder();
+            UpdateBuffer(aob);
         }
 
         public void Use()
         {
-            AutoBinder.BindOnly();
-            //using var abb = AutoBinder.Use();
             UpdateBuffer();
         }
     }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.SSBO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.SSBO
 {
     // WARNING: 実装されない可能性あり。
     internal class StructSSBOManager : ISSBOManager

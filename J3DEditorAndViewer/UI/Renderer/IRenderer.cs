@@ -2,11 +2,6 @@
 using OpenTK.GLControl;
 using OpenTK.Mathematics;
 //
-using J3DEditorAndViewer.FileFormat.SectionFormat;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.EBO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -3,8 +3,6 @@ using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

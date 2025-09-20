@@ -1,21 +1,19 @@
 ﻿// OpenTK
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.EBO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.EBO
 {
     internal class TriangleEBOManager : IEBOManager
     {
-        private readonly IAutoBindBuffer AutoBinder;
-
         private bool disposed = false;
         private bool isModified = false;
 
@@ -32,6 +30,11 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.EBO
 
         readonly private int BufferIndex;
 
+        private IAutoObjectBinder CreateObjectBinder()
+        {
+            return new AutoElementArrayBufferBinder(BufferIndex);
+        }
+
         public TriangleEBOManager(uint[] FaceIndexes)
         {
             data = FaceIndexes;
@@ -40,7 +43,6 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.EBO
             // 頂点インデックスバッファを生成
             BufferIndex = GL.GenBuffer();
 
-            AutoBinder = new AutoBindBuffer(BufferTarget.ElementArrayBuffer, BufferIndex);
             UpdateBuffer();
         }
 
@@ -55,23 +57,25 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.EBO
         public void Dispose()
         {
             if (disposed) { return; }
-            AutoBinder.Dispose();
             GL.DeleteBuffer(BufferIndex);
         }
 
         public void Use()
         {
-            AutoBinder.BindOnly();
-            //using var abb = AutoBinder.Use();
-            UpdateBuffer();
+            using var aob = CreateObjectBinder();
+            UpdateBuffer(aob);
             GL.DrawElements(PrimitiveType.Triangles, Data.Length, DrawElementsType.UnsignedInt, 0);
         }
-
-        private void UpdateBuffer()
+        private void UpdateBuffer(IAutoObjectBinder aob)
         {
             if (!isModified) { return; }
             isModified = false;
             GL.BufferData(BufferTarget.ElementArrayBuffer, Data.Length * sizeof(uint), Data, BufferUsageHint.StaticDraw);
+        }
+        private void UpdateBuffer()
+        {
+            using var aob = CreateObjectBinder();
+            UpdateBuffer(aob);
         }
 
         public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, int location = 0)

@@ -1,28 +1,27 @@
 ﻿// OpenTK
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
-using System.Diagnostics;
-using System.CodeDom;
-using System.DirectoryServices.ActiveDirectory;
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
+using System.Text;
+using System.Threading.Tasks;
 
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO
 {
-    internal class StructVAOManager<InT> : IVAOManager<InT>
+    internal class StructVBOManager<InT> : IVBOManager<InT>
         where InT : struct//, IVertexObject
     {
-        private readonly IAutoBindBuffer AutoBinder;
-
         private bool disposed = false;
         private bool isModified = false;
 
@@ -56,13 +55,16 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO
         }
 
         readonly private int BufferIndex;
-        readonly private int ArrayIndex;
+
+        private IAutoObjectBinder CreateObjectBinder()
+        {
+            return new AutoVertexBufferBinder(BufferIndex);
+        }
 
         public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, int location = 0)
         {
             location = 0;
-            GL.BindVertexArray(ArrayIndex);
-            AutoBinder.BindOnly();
+            using var aob = CreateObjectBinder();
 
             // var MemberInfo = VertexObjectT.MemberNames[location];
             var MembersInfo = typeof(InT).GetFields();
@@ -76,12 +78,11 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO
                 location++;
             }
 
-            GL.BindVertexArray(0);
             // 次の location = X を返す。
             return location;
         }
 
-        public StructVAOManager(InT[] VertexData)
+        public StructVBOManager(InT[] VertexData)
         {
             data = VertexData;
             isModified = true;
@@ -89,14 +90,10 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO
 
             // BufferObjectの確保。このクラスは構造体を利用するため1つのみ。
             BufferIndex = GL.GenBuffer();
-            AutoBinder = new AutoBindBuffer(BufferTarget.ArrayBuffer, BufferIndex);
             UpdateBuffer();
-
-            // ArrayObjectの確保。
-            ArrayIndex = GL.GenVertexArray();
         }
 
-        ~StructVAOManager()
+        ~StructVBOManager()
         {
             if (!disposed)
             {
@@ -108,26 +105,21 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO
         {
             if (disposed) return;
             disposed = true;
-            GL.BindVertexArray(0);
-
-            AutoBinder.Dispose();
-            GL.DeleteVertexArray(ArrayIndex);
             GL.DeleteBuffer(BufferIndex);
         }
 
         public void UpdateBuffer()
         {
             if (!isModified) { return; }
+            using var aob = CreateObjectBinder();
             isModified = false;
             GL.BufferData(BufferTarget.ArrayBuffer, LengthInBytes, data, BufferUsageHint.StaticDraw);
         }
 
         public void Use()
         {
-            AutoBinder.BindOnly();
             //using var abb = AutoBinder.Use();
             UpdateBuffer();
-            GL.BindVertexArray(ArrayIndex);
         }
     }
 }

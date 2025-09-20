@@ -6,29 +6,30 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer
 {
     /// <summary>
     /// ブロックでのBindBuffer動作を楽に実装するためのクラス。<br/>
     /// クラスでの使用を除き、基本using束縛して使用して下さい。
     /// </summary>
-    internal sealed class AutoBindBuffer : IAutoBindBuffer
+    internal abstract class AutoBufferBinder : IAutoObjectBinder
     {
-        bool disposed;
+        internal bool disposed;
 
-        public readonly BufferTarget BufferTarget;
-        public readonly int BufferIndex;
+        internal readonly BufferTarget BufferTarget;
+        internal readonly int Handle;
 
-        public AutoBindBuffer(BufferTarget bufferTarget, int bufferIndex)
+        public AutoBufferBinder(BufferTarget bufferTarget, int bufferIndex)
         {
             BufferTarget = bufferTarget;
-            BufferIndex = bufferIndex;
-            GL.BindBuffer(BufferTarget, BufferIndex);
+            Handle = bufferIndex;
+            GL.BindBuffer(BufferTarget, Handle);
         }
-        ~AutoBindBuffer()
+        ~AutoBufferBinder()
         {
             if (!disposed)
             {
@@ -43,14 +44,11 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object
             GL.BindBuffer(BufferTarget, 0);
         }
 
-        public IAutoBindBuffer Use()
-        {
-            return new AutoBindBuffer(BufferTarget, BufferIndex);
-        }
-
-        public void BindOnly()
-        {
-            GL.BindBuffer(BufferTarget, BufferIndex);
-        }
+        public IAutoObjectBinder MoveObject() => throw new NotImplementedException();
+        //{
+        //    if (disposed == true) throw new ObjectDisposedException(GetType().Name);
+        //    disposed = true;
+        //    return new AutoObjectBinder(BufferTarget, BufferIndex);
+        //}
     }
 }

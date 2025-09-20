@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.UBO
 {
     // TODO: typeof().GetMembers()が上手く動作しなかった時のために残しています。
     

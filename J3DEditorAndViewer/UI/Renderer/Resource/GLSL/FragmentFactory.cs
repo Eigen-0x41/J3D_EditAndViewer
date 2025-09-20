@@ -3,13 +3,13 @@ using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
+using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.UBO;
 
 namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL
 {

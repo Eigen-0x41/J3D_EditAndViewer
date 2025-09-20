@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO
+namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO
 {
-    internal interface IVAOManager<InT> : IVAOCommonManager
+    internal interface IVBOManager<InT> : IVBOCommonManager
         where InT : struct
     {
         public InT[] Data { get; set; }
