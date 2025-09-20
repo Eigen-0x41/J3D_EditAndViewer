@@ -38,11 +38,11 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO
 
         readonly private int BufferIndex;
 
-        public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, in int beginIndex = 0)
+        public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, int location = 0)
         {
             var membersInfo = typeof(UniformT).GetFields();
-            builder.Append($"layout(std140, binding = {beginIndex}) uniform {DefineName} {{\n");
-            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, beginIndex, BufferIndex);
+            builder.Append($"layout(std140, binding = {location}) uniform {DefineName} {{\n");
+            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, location, BufferIndex);
             foreach (int I in Enumerable.Range(0, membersInfo.Length))
             {
                 var memberInfo = membersInfo[I];
@@ -51,8 +51,9 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.UBO
                 builder.Append($"  {typeGLSL.Name} {memberInfo.Name};\n");
             }
             builder.Append("};\n");
+            location++;
 
-            return beginIndex + 1;
+            return location;
         }
 
 

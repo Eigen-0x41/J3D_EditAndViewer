@@ -58,25 +58,27 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.VAO
         readonly private int BufferIndex;
         readonly private int ArrayIndex;
 
-        public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, in int beginLocation = 0)
+        public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, int location = 0)
         {
+            location = 0;
             GL.BindVertexArray(ArrayIndex);
+            AutoBinder.BindOnly();
 
             // var MemberInfo = VertexObjectT.MemberNames[location];
             var MembersInfo = typeof(InT).GetFields();
-            foreach (int location in Enumerable.Range(beginLocation, MembersInfo.Length))
+            foreach (var MemberInfo in MembersInfo)
             {
-                var MemberInfo = MembersInfo[location];
                 IGLSLType GLSLType = typeTrait.TypeOf(MemberInfo.FieldType);
 
                 builder.Append($"layout(location = {location}) in {GLSLType.Name} {MemberInfo.Name};\n");
                 GL.VertexAttribPointer(location, GLSLType.LengthOfType, GLSLType.Type, false, SizeInBytes, Marshal.OffsetOf<InT>(MemberInfo.Name));
                 GL.EnableVertexAttribArray(location);
+                location++;
             }
 
             GL.BindVertexArray(0);
             // 次の location = X を返す。
-            return beginLocation + MembersInfo.Length;
+            return location;
         }
 
         public StructVAOManager(InT[] VertexData)

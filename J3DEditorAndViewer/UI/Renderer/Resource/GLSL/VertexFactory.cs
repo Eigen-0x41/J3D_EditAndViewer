@@ -20,22 +20,22 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL
         private bool disposed;
         private string SourceCode;
 
-        private IVAOCommonManager[] VAOManagers;
+        private IVAOCommonManager VAOManager;
         private IUBOCommonManager[] UniformManagers;
         private IGLSLTypeTraits GLSLTypeTrait;
         public ShaderType ShaderType { get { return ShaderType.VertexShader; } }
 
-        public VertexFactory(IVAOCommonManager[] vAOManagers, IUBOCommonManager[] uniformManagers, IGLSLTypeTraits typeTrait, string sourceCode)
+        public VertexFactory(IVAOCommonManager vAOManager, IUBOCommonManager[] uniformManagers, IGLSLTypeTraits typeTrait, string sourceCode)
         {
             GLSLTypeTrait = typeTrait;
-            VAOManagers = vAOManagers;
+            VAOManager = vAOManager;
             UniformManagers = uniformManagers;
             SourceCode = sourceCode + "\n";
         }
-        public VertexFactory(IVAOCommonManager[] vAOManagers, IGLSLTypeTraits typeTrait, string sourceCode)
+        public VertexFactory(IVAOCommonManager vAOManager, IGLSLTypeTraits typeTrait, string sourceCode)
         {
             GLSLTypeTrait = typeTrait;
-            VAOManagers = vAOManagers;
+            VAOManager = vAOManager;
             UniformManagers = new IUBOCommonManager[] { };
             SourceCode = sourceCode + "\n";
         }
@@ -50,11 +50,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL
 
         public int WriteDefinicator(StringBuilder builder)
         {
-            int currentIndexLocation = 0;
-            foreach (var vao in VAOManagers)
-            {
-                currentIndexLocation = vao.WriteDefinicator(builder, GLSLTypeTrait, currentIndexLocation);
-            }
+            VAOManager.WriteDefinicator(builder, GLSLTypeTrait);
 
             int currentIndexBinding = 0;
             foreach (var uniform in UniformManagers)
@@ -76,18 +72,14 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL
                 uniform.Dispose();
             }
 
-            foreach (var vao in VAOManagers)
-            {
-                vao.Dispose();
-            }
+            VAOManager.Dispose();
+
         }
 
         public void Use()
         {
-            foreach (var vao in VAOManagers)
-            {
-                vao.Use();
-            }
+            VAOManager.Use();
+
 
             foreach (var uniform in UniformManagers)
             {

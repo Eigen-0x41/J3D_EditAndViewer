@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object
 {
-    internal interface IBuffer : IFactory
+    internal interface IAutoObjectBinder : IDisposable
     {
-        int WriteDefinicator(StringBuilder builder, Type.IGLSLTypeTraits typeTrait, int beginIndex = 0);
+        public IAutoObjectBinder MoveObject();
     }
 }

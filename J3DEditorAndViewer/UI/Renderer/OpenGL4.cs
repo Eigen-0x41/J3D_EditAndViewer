@@ -49,7 +49,8 @@ in vec4 VertexColor;
 out vec4 FragColor;
 
 void main() {
-  FragColor = VertexColor;
+  // FragColor = VertexColor;
+  FragColor = vec4(1f);
 }
 ";
 
@@ -62,13 +63,13 @@ void main() {
             VAOManager = new StructVAOManager<VTX1Data>(j3d_FileDialog.J3DData.Model.VerTexData.GetData());
             UniformManagerProjection = new StructUBOManager<ProjectionUniform>("CoordinateUniform", new ProjectionUniform());
             UniformManagerMixer = new StructUBOManager<MixerUniform>("MixerUniform", new MixerUniform());
-            VertexFactory = new VertexFactory([VAOManager], [UniformManagerProjection, UniformManagerMixer], glslTypeTrait, VShaderCode);
+            VertexFactory = new VertexFactory(VAOManager, [UniformManagerProjection, UniformManagerMixer], glslTypeTrait, VShaderCode);
 
             FragmentFactory = new FragmentFactory(glslTypeTrait, FShaderCode);
 
             VEOManager = new TriangleEBOManager(j3d_FileDialog.J3DData.Model.ShapeData.GetTriangleindexes().ToArray());
 
-            Shader = new J3DShader(VertexFactory, FragmentFactory);
+            Shader = new TestShader(VertexFactory, FragmentFactory);
 
             // カメラ
             CameraPosition = new(0.0f, 0.0f, 0.0f);

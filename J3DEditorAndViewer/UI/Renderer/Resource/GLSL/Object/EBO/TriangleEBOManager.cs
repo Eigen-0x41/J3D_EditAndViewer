@@ -74,7 +74,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.EBO
             GL.BufferData(BufferTarget.ElementArrayBuffer, Data.Length * sizeof(uint), Data, BufferUsageHint.StaticDraw);
         }
 
-        public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, in int beginIndex = 0)
+        public int WriteDefinicator(StringBuilder builder, IGLSLTypeTraits typeTrait, int location = 0)
         {
             // シェーダコードに関わらないため実装しません。
             throw new NotImplementedException();
