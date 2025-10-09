@@ -19,7 +19,8 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData
 
         public Vector3 Set(BinaryReader br, byte shiftBit)
         {
-            return new Vector3(BigEndian.ReadInt16(br) >> shiftBit, BigEndian.ReadInt16(br) >> shiftBit, BigEndian.ReadInt16(br) >> shiftBit);
+            float divValue = (float)(0x01 << shiftBit);
+            return new Vector3(BigEndian.ReadInt16(br) / divValue, BigEndian.ReadInt16(br) / divValue, BigEndian.ReadInt16(br) / divValue);
         }
     }
 }

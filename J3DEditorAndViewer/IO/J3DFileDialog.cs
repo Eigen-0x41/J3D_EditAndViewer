@@ -13,6 +13,8 @@ using System.Windows.Forms;
 using J3DEditorAndViewer.FileFormat;
 using J3DEditorAndViewer.FileFormat.Model_3D;
 using J3DEditorAndViewer.FileFormat.SectionFormat;
+using J3DEditorAndViewer.FileFormat.JSystem.J3D;
+using GalaxyPlantInCrystal_KEIJI.EndianBinaryStream.BinaryReaderSystem;
 
 
 namespace J3DEditorAndViewer.IO
@@ -27,6 +29,8 @@ namespace J3DEditorAndViewer.IO
         //public TreeNode _tn { get; private set; }
         //private TreeNode tn;
         public J3D J3DData { get; private set; }
+        public J3D2 J3DData2 { get; private set; }
+
 
         public J3DFileDialog()
         {
@@ -60,9 +64,16 @@ namespace J3DEditorAndViewer.IO
         private void OpenFileStream()
         {
             J3DData = new J3D();
+            J3DData2 = new J3D2();
             using (FileStream fs = new FileStream(_openFilePath, FileMode.Open))
             {
                 J3DData.SetFromFile(fs);
+            }
+            using (FileStream fs = new(_openFilePath, FileMode.Open))
+            {
+                using EndianBinaryReaderBase br = new BigEndianBinaryReader(fs);
+                br.BaseStream.Seek(0, SeekOrigin.Begin);
+                J3DData2.Read(br);
             }
         }
 

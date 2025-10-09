@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Library
+namespace J3DEditorAndViewer.UI.Renderer.Library
 {
     /// <summary>
     /// main関数でusing束縛による使用を想定しています。

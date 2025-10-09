@@ -1,11 +1,11 @@
 ﻿// OpenTK
-using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1ColorData;
-using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData;
-using J3DEditorAndViewer.IO;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
+using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1ColorData;
+using J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData;
+using J3DEditorAndViewer.IO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,20 +24,26 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
     public struct VTX1Data
     {
         public Vector3 Position;
-        public Vector4 Color0;
-        public Vector4 Color1;
+        public Vector4i Color0;
+        public Vector4i Color1;
 
         public VTX1Data()
         {
             Position = new Vector3(0.0f, 0.0f, 0.0f);
-            Color0 = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-            Color1 = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+            Color0 = new Vector4i(0, 0, 0, 255);
+            Color1 = new Vector4i(0, 0, 0, 255);
         }
         public VTX1Data(float x, float y, float z)
         {
             Position = new Vector3(x, y, z);
-            Color0 = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-            Color1 = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+            Color0 = new Vector4i(0, 0, 0, 255);
+            Color1 = new Vector4i(0, 0, 0, 255);
+        }
+        public VTX1Data(float x, float y, float z, int r, int g, int b)
+        {
+            Position = new Vector3(x, y, z);
+            Color0 = new Vector4i(r, g, b, 255);
+            Color1 = new Vector4i(r, g, b, 255);
         }
     };
 
@@ -401,11 +407,11 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat
             }
             for (int i = 0; i < Color0.Count; i++)
             {
-                retValue[i].Color0 = Color0[i];
+                // retValue[i].Color0 = Color0[i];
             }
             for (int i = 0; i < Color1.Count; i++)
             {
-                retValue[i].Color1 = Color1[i];
+                // retValue[i].Color1 = Color1[i];
             }
             return retValue;
         }

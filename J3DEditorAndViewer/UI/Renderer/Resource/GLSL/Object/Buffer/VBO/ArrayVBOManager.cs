@@ -3,31 +3,27 @@ using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 //
-using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO;
 using J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Type;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Numerics;
 
 namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO
 {
     /// <summary>
-    /// struct内で定義されたGLSL互換型の配列を扱うクラス。
+    /// Vector4などのGLSL互換型の配列を扱うクラス。
     /// </summary>
     /// <typeparam name="InT"></typeparam>
-    internal class StructVBOManager<InT> : IVBOManager<InT>
-        where InT : struct//, IVertexObject
+    internal class ValueVBOManager<InT> : IVBOManager<InT>
+        where InT : struct
     {
         private bool disposed = false;
         private bool isModified = false;
+        private bool isDummy = false;
 
         private InT[] data;
         public InT[] Data
@@ -39,6 +35,7 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO
                 data = value;
             }
         }
+        public string DefineName { get; private set; }
         /// <summary>
         /// 型Tのバイト数
         /// </summary>
@@ -60,6 +57,12 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO
 
         readonly private int BufferIndex;
 
+        private int getStrideSize()
+        {
+            if (isDummy) return 0;
+            return SizeInBytes;
+        }
+
         private IAutoObjectBinder CreateObjectBinder()
         {
             return new AutoVertexBufferBinder(BufferIndex);
@@ -70,34 +73,47 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO
             location = 0;
             using var aob = CreateObjectBinder();
 
-            // var MemberInfo = VertexObjectT.MemberNames[location];
-            var MembersInfo = typeof(InT).GetFields();
-            foreach (var MemberInfo in MembersInfo)
-            {
-                IGLSLType GLSLType = typeTrait.TypeOf(MemberInfo.FieldType);
+            var type = typeof(InT);
+            IGLSLType GLSLType = typeTrait.TypeOf(type);
 
-                builder.Append($"layout(location = {location}) in {GLSLType.Name} {MemberInfo.Name};\n");
-                GL.VertexAttribPointer(location, GLSLType.LengthOfType, GLSLType.Type, false, SizeInBytes, Marshal.OffsetOf<InT>(MemberInfo.Name));
-                GL.EnableVertexAttribArray(location);
-                location++;
-            }
+            builder.Append($"layout(location = {location}) in {GLSLType.Name} {DefineName};\n");
+            GL.VertexAttribPointer(location, GLSLType.LengthOfType, GLSLType.Type, false, getStrideSize(), 0);
+            GL.EnableVertexAttribArray(location);
+            location++;
 
             // 次の location = X を返す。
             return location;
         }
 
-        public StructVBOManager(InT[] VertexData)
+        public ValueVBOManager(string defineName, InT[] VertexData)
         {
+            DefineName = defineName;
             data = VertexData;
             isModified = true;
-
+            isDummy = false;
 
             // BufferObjectの確保。このクラスは構造体を利用するため1つのみ。
             BufferIndex = GL.GenBuffer();
             UpdateBuffer();
         }
 
-        ~StructVBOManager()
+        /// <summary>
+        /// ダミーモード
+        /// </summary>
+        /// <param name="defineName"></param>
+        protected ValueVBOManager(string defineName)
+        {
+            DefineName = defineName;
+            data = new InT[1];
+            isModified = true;
+            isDummy = true;
+
+            // BufferObjectの確保。このクラスは構造体を利用するため1つのみ。
+            BufferIndex = GL.GenBuffer();
+            UpdateBuffer();
+        }
+
+        ~ValueVBOManager()
         {
             if (!disposed)
             {
@@ -115,8 +131,8 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO
         public void UpdateBuffer()
         {
             if (!isModified) { return; }
-            using var aob = CreateObjectBinder();
             isModified = false;
+            using var aob = CreateObjectBinder();
             GL.BufferData(BufferTarget.ArrayBuffer, LengthInBytes, data, BufferUsageHint.StaticDraw);
         }
 
@@ -124,6 +140,14 @@ namespace J3DEditorAndViewer.UI.Renderer.Resource.GLSL.Object.Buffer.VBO
         {
             //using var abb = AutoBinder.Use();
             UpdateBuffer();
+        }
+    }
+
+    internal class DummyVBOManager<InT> : ValueVBOManager<InT>
+        where InT : struct
+    {
+        public DummyVBOManager(string defineName) : base(defineName)
+        {
         }
     }
 }

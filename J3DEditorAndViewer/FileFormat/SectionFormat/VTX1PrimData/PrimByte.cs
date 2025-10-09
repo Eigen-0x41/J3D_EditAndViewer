@@ -18,7 +18,8 @@ namespace J3DEditorAndViewer.FileFormat.SectionFormat.VTX1PrimData
 
         public Vector3 Set(BinaryReader br, byte shiftBit)
         {
-            return new Vector3(br.ReadByte() >> shiftBit, br.ReadByte() >> shiftBit, br.ReadByte() >> shiftBit);
+            float divValue = (float)(0x01 << shiftBit);
+            return new Vector3(br.ReadByte() / divValue, br.ReadByte() / divValue, br.ReadByte() / divValue);
         }
 
 
