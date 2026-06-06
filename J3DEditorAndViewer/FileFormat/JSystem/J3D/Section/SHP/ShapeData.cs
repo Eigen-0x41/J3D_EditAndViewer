@@ -23,6 +23,8 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.SHP
         }
 
         public MatrixType Type { get; init; }
+        public List<VertexIndexAttribute> UsedAttributesInPrimitive;
+
         public int TableCount { get; init; }
 
         // public Matrix[] Matrices { get; init; }
@@ -51,11 +53,11 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.SHP
             BoundingBoxMin = new(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             BoundingBoxMax = new(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
 
-            List<VertexIndexAttribute> attributes = VertexIndexAttribute.Read(br, beginPos, sHPDataHeader);
+            UsedAttributesInPrimitive = VertexIndexAttribute.Read(br, beginPos, sHPDataHeader);
             // for (int i = 0; i < TableCount; i++) { }
             for (int i = 0; i < TableCount; i++)
             {
-                Primitives[i] = new(br, beginPos, attributes, sHPDataHeader, primitiveTables[i + tablePrimitiveBeginIndex]);
+                Primitives[i] = new(br, beginPos, UsedAttributesInPrimitive, sHPDataHeader, primitiveTables[i + tablePrimitiveBeginIndex]);
             }
         }
 

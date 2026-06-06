@@ -1,12 +1,13 @@
 ﻿// OpenTK
-using OpenTK.GLControl;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
+using DocumentFormat.OpenXml.Drawing;
 //
 using GalaxyPlantInCrystal_KEIJI.EndianBinaryStream.BinaryReaderSystem;
 using GalaxyPlantInCrystal_KEIJI.IO.BinarySystem.Util;
 using J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.INF;
 using J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.VTX.Color;
+using OpenTK.GLControl;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,52 +25,28 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.VTX
     public class VertexObjectArrays
     {
 
-        private List<Matrix4> positionMatrix = new(); // 使用例が無い。
-        public List<Matrix4> PositionMatrix => positionMatrix;
+        public List<Matrix4> PositionMatrix = new(); // 使用例が無い。
 
-        private List<Matrix2>[] texMatrix = [
+        public List<Matrix2>[] TexMatrix = [
             new(),new(),new(),new(),
             new(),new(),new(),new(),
         ]; // 使用例が無い。
-        public List<Matrix2> TexMatrix0 => texMatrix[0];
-        public List<Matrix2> TexMatrix1 => texMatrix[1];
-        public List<Matrix2> TexMatrix2 => texMatrix[2];
-        public List<Matrix2> TexMatrix3 => texMatrix[3];
-        public List<Matrix2> TexMatrix4 => texMatrix[4];
-        public List<Matrix2> TexMatrix5 => texMatrix[5];
-        public List<Matrix2> TexMatrix6 => texMatrix[6];
-        public List<Matrix2> TexMatrix7 => texMatrix[7];
 
-        private List<Vector4> position = new();
-        public List<Vector4> Position => position;
+        public List<Vector4> Position = new();
 
-        private List<Vector3> normal = new();
-        private List<Vector3> binormal = new(); // 使用例が無い。
-        private List<Vector3> tangent = new();  // 使用例が無い。
-        public List<Vector3> Normal => normal;
-        public List<Vector3> Binormal => binormal; // 使用例が無い。
-        public List<Vector3> Tangent => tangent;  // 使用例が無い。
+        /// <summary>
+        /// Vector3[3]を明確にするためにMatrix3を使用します。
+        /// </summary>
+        public List<Matrix3> NBT = new();
 
-        private List<Vector4i>[] color = [
-        new(),new(),
-        ]; // あまり使用されない。
-        public List<Vector4i> Color0 => color[0];
-        public List<Vector4i> Color1 => color[1];
+        public List<Vector4i>[] Color = [
+            new(),new(),
+        ];
 
-
-        private List<Vector3>[] texCoord = [
+        public List<Vector3>[] TexCoord = [
             new(),new(),new(),new(),
             new(),new(),new(),new(),
         ]; // 3以降はあまり使用されない。
-        public List<Vector3> TexCoord0 => texCoord[0];
-        public List<Vector3> TexCoord1 => texCoord[1];
-        public List<Vector3> TexCoord2 => texCoord[2];
-        public List<Vector3> TexCoord3 => texCoord[3];
-        public List<Vector3> TexCoord4 => texCoord[4];
-        public List<Vector3> TexCoord5 => texCoord[5];
-        public List<Vector3> TexCoord6 => texCoord[6];
-        public List<Vector3> TexCoord7 => texCoord[7];
-
 
         public VertexObjectArrays(EndianBinaryReaderBase br, in ISectionHeader vTXHeader, in VTXDataHeader vTXSectionHeader, in IINFVertex iNFVertex)
         {
@@ -140,7 +117,7 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.VTX
             var values = attribute.ReadGXCompornent(br, dataHeader.LengthInByte);
             foreach (var value in values)
             {
-                position.Add(new(value[0], value[1], value.ElementAtOrDefault(2), 1.0f));
+                Position.Add(new(value[0], value[1], value.ElementAtOrDefault(2), 1.0f));
             }
         }
         private void ReadNBT(EndianBinaryReaderBase br, in VertexAttribute attribute, in long beginPos, in VTXDataHeader vTXDataHeader, in IINFVertex iNFVertex)
@@ -153,12 +130,20 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.VTX
             var values = attribute.ReadGXCompornent(br, dataHeader.LengthInByte);
             foreach (var value in values)
             {
-                normal.Add(new(value[0], value[1], value[2]));
                 if (value.Length > 3)
                 {
-                    binormal.Add(new(value[3], value[4], value[5]));
-                    tangent.Add(new(value[6], value[7], value[8]));
+                    NBT.Add(new(
+                        value[0], value[1], value[2],
+                        value[3], value[4], value[5],
+                        value[6], value[7], value[8]
+                        ));
+                    break;
                 }
+                NBT.Add(new(
+                    value[0], value[1], value[2],
+                    float.NaN, float.NaN, float.NaN,
+                    float.NaN, float.NaN, float.NaN
+                    ));
             }
         }
         private void ReadColor(in int ColorID, EndianBinaryReaderBase br, in VertexAttribute attribute, in long beginPos, in VTXDataHeader vTXDataHeader, in IINFVertex iNFVertex)
@@ -173,7 +158,7 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.VTX
             br.BaseStream.Seek(beginPos + dataHeader.Offset, SeekOrigin.Begin);
             for (int i = 0; i < colorsLength; i++)
             {
-                color[ColorID].Add(reader.Read(br));
+                Color[ColorID].Add(reader.Read(br));
             }
         }
         private void ReadTexCoord(in int TexID, EndianBinaryReaderBase br, in VertexAttribute attribute, in long beginPos, in VTXDataHeader vTXDataHeader, in IINFVertex iNFVertex)
@@ -186,7 +171,7 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.VTX
             var values = attribute.ReadGXCompornent(br, dataHeader.LengthInByte);
             foreach (var value in values)
             {
-                texCoord[TexID].Add(new(value[0], value.ElementAtOrDefault(1), 1.0f));
+                TexCoord[TexID].Add(new(value[0], value.ElementAtOrDefault(1), 1.0f));
             }
         }
     }

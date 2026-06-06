@@ -12,17 +12,7 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.SHP
 {
     public class Primitive
     {
-        public enum PrimitiveType
-        {
-            Quad = 0x80,
-            Triangle = 0x90,
-            TriangleStrip = 0x98,
-            TriangleFan = 0xa0,
-            Line = 0xB0,
-            Point = 0xB8,
-        }
-
-        public PrimitiveType Type { get; private set; }
+        public GXPrimitiveType Type { get; private set; }
 
         public bool EnablePositionMatrix = false;
         public bool EnableTexMatrix0 = false;
@@ -46,19 +36,19 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.SHP
         public bool EnableTexCoord6 = false;
         public bool EnableTexCoord7 = false;
 
-        public ElementObject[] Indexes { get; private set; }
+        public GXElement[] Elements { get; private set; }
 
         public Primitive(EndianBinaryReaderBase br, in long beginPos, in List<VertexIndexAttribute> attributes, in SHPDataHeader sHPDataHeader, in PrimitiveTable primitiveTable)
         {
             var offset = beginPos + sHPDataHeader.ArrayDataPair[SHPDataHeader.Key.Primitives].Offset;
             br.BaseStream.Seek(offset + primitiveTable.Offset, SeekOrigin.Begin);
 
-            Type = (PrimitiveType)br.ReadByte();
-            Indexes = new ElementObject[br.ReadInt16()];
+            Type = (GXPrimitiveType)br.ReadByte();
+            Elements = new GXElement[br.ReadInt16()];
 
-            for (int i = 0; i < Indexes.Length; i++)
+            for (int i = 0; i < Elements.Length; i++)
             {
-                Indexes[i] = new ElementObject();
+                Elements[i] = new GXElement();
                 foreach (var attribute in attributes)
                 {
                     switch (attribute.AttributeType)
@@ -85,7 +75,7 @@ namespace J3DEditorAndViewer.FileFormat.JSystem.J3D.Section.SHP
                         case GXAttribType.TexCoord6: EnableTexCoord6 = true; break;
                         case GXAttribType.TexCoord7: EnableTexCoord7 = true; break;
                     }
-                    Indexes[i].SetIndex(br, attribute);
+                    Elements[i].GetElements(br, attribute);
                 }
             }
 
